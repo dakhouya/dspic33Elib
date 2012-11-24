@@ -1,25 +1,22 @@
 /************************************************************/
-/* uart.h													*/
-/* Library for the UART module of dspic33E			 		*/
+/* globaldef.h												*/
+/* Library that contain global definitions					*/
+/* 															*/
+/* MCU : 													*/
 /*															*/
-/* MCU : dspic33E											*/
-/*															*/
-/* Author : David Khouya									*/
-/* Date	  :	xx/11/2012										*/
-/* Version: 0.1 											*/
+/* Author : 												*/
+/* Date	  :													*/
+/* Version:  												*/
 /************************************************************/
 
 /************************************************************/
-#ifndef _UART_MODULE_
-#define _UART_MODULE_
+#ifndef _GLOBALDEF_MODULE_
+#define _GLOBALDEF_MODULE_
 /************************************************************/
 
 /************************************************************/
 /*						   INCLUDES			 				*/
 /************************************************************/
-//#include "p33EP512MU810.h"
-#include "globaldef.h"
-#include "p33EP512MC806.h"
 
 /************************************************************/
 
@@ -27,41 +24,29 @@
 /************************************************************/
 /*			           MACRO DEFINITIONS			 		*/
 /************************************************************/
-#define UART_BUFFER_SIZE 256
+#define ENABLE		1
+#define DISABLE		0
+
+#define TRUE		1
+#define FALSE		0
+
+#define bool		unsigned char
+
+#define uint8		unsigned char
+#define int8		char
+#define uint16		unsigned int
+#define int16		int
+#define uint32		unsigned long
+#define int32		long
+#define uint64		unsigned long long
+#define	int64		long long
 /************************************************************/
 
 
 /************************************************************/
 /*			        STRUCTURE DEFINITIONS			 		*/
 /************************************************************/
-typedef enum UartBase
-{
-	UARTBASE1 = 0x0220,	/*Address 0x0220*/
-	UARTBASE2 = 0x0230,	/*Address 0x0230*/
-	UARTBASE3 = 0x0250,	/*Address 0x0250*/
-	UARTBASE4 = 0x02B0	/*Address 0x02B0*/
-}UartBase_t;
 
-typedef struct UartPort
-{
-	uint8 	Uartno;
-	uint8	TxMessage[UART_BUFFER_SIZE];
-	uint8	TxMessageLength;
-	uint8*	RxMessage;
-	uint8	TxIsBusy;
-	void	(*Txfct)(void);
-	void	(*Rxfct)(void); 
-}sUartPort_t;
-
-typedef struct UartInit
-{
-	uint8 	Uartno;
-	uint16	Uxmode;
-	uint16	Uxsta;
-	uint16  Uxtxreg;
-	uint16	Uxrxreg;
-	uint16	Uxbrg;
-}sUartInit_t;
 /************************************************************/
 
 
@@ -82,10 +67,7 @@ typedef struct UartInit
 /************************************************************/
 /*				     PUBLIC PROTOTYPES			 			*/
 /************************************************************/
-void UartInit(sUartInit_t*);
-void UartInitPort(sUartPort_t*);
-void UartEcho(void);
-void UartTxFrame(sUartPort_t*);
+
 /************************************************************/
 
 
