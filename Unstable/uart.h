@@ -27,20 +27,55 @@
 /************************************************************/
 /*			           MACRO DEFINITIONS			 		*/
 /************************************************************/
-#define UART_BUFFER_SIZE 256
+/*Should be in hardware profil definitions*/
+#define ifndef CPU_CLOCK
+#define CPU_CLOCK 				120000000
+#endif
+
+#define UART_BUFFER_SIZE 		256
+#define NBUART 					4
+
+/*For BRGG = 0*/
+#define BAUDRATE(BAUD) 			(((CPU_CLOCK)/2)/(16*BAUD))-1
+
+/*For BRGG = 1*/
+//#define BAUDRATE(BAUD) 		(((CPU_CLOCK)/2)/(4*BAUD))-1
+
+/*UartParam*/
+#define	BRGH_LOW_SPEED			0
+#define	BRGH_LOW_SPEED			1
+
+#define 8BITS_NOPARITY			0
+#define 8BITS_EVENPARITY		1
+#define 8BITS_ODDPARITY			2
+#define 9BITS_NOPARITY 			3
+
+#define	2STOP_BITS				0
+#define	1STOP_BIT				1
+
+#define 2400BAUD				BAUDRATE(2400)
+#define 4800BAUD				BAUDRATE(4800)
+#define 9600BAUD				BAUDRATE(9600)
+#define 14400BAUD				BAUDRATE(14400)
+#define 19600BAUD				BAUDRATE(19600)
+#define 38400BAUD				BAUDRATE(38400)	
+#define 57600BAUD				BAUDRATE(57600)
+#define 115200BAUD				BAUDRATE(115200)	
 /************************************************************/
 
 
 /************************************************************/
 /*			        STRUCTURE DEFINITIONS			 		*/
 /************************************************************/
-typedef enum UartBase
+typedef struct Param
 {
-	UARTBASE1 = 0x0220,	/*Address 0x0220*/
-	UARTBASE2 = 0x0230,	/*Address 0x0230*/
-	UARTBASE3 = 0x0250,	/*Address 0x0250*/
-	UARTBASE4 = 0x02B0	/*Address 0x02B0*/
-}UartBase_t;
+	uint8 BRGH;
+	uint8 RxPolarity;
+	uint8 Parity;
+	uint8 StopBit;
+	uint8 BaudRate;
+}sUartParam;
+
 
 typedef struct UartPort
 {
@@ -55,7 +90,6 @@ typedef struct UartPort
 
 typedef struct UartInit
 {
-	uint8 	Uartno;
 	uint16	Uxmode;
 	uint16	Uxsta;
 	uint16  Uxtxreg;
@@ -82,10 +116,15 @@ typedef struct UartInit
 /************************************************************/
 /*				     PUBLIC PROTOTYPES			 			*/
 /************************************************************/
-void UartInit(sUartInit_t*);
-void UartInitPort(sUartPort_t*);
-void UartEcho(void);
-void UartTxFrame(sUartPort_t*);
+void UartInit(uint8 ubUartNo, sUartParam*)
+void UartInitPort(sUartPort_t* sUartPort);
+void UartEcho(&ubChar ubChar);
+void UartTxFrame(sUartPort_t* sUartPort);
+
+void UartRxEnable(uint8 ubUartNo, bool state);
+void UartTxEnable(uint8 ubUartNo, bool state);
+void UartInterruptRxEnable(uint8 ubUartNo, bool state);
+void UartInterruptTxEnable(uint8 ubUartNo, bool state);
 /************************************************************/
 
 

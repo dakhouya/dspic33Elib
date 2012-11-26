@@ -25,7 +25,14 @@
 /************************************************************/
 /*			        STRUCTURE DEFINITIONS			 		*/
 /************************************************************/
-
+typedef enum UartBase
+{
+	PADDING = 0;
+	UARTBASE1 = (sUartInit_t*)0x0220,	/*Address 0x0220*/
+	UARTBASE2 = (sUartInit_t*)0x0230,	/*Address 0x0230*/
+	UARTBASE3 = (sUartInit_t*)0x0250,	/*Address 0x0250*/
+	UARTBASE4 = (sUartInit_t*)0x02B0	/*Address 0x02B0*/
+}UartBase;
 /************************************************************/
 
 
@@ -46,7 +53,7 @@
 /************************************************************/
 /*			         PRIVATE PROTOTYPES			 			*/
 /************************************************************/
-
+bool IsUartInterfaceValid(uint8 ubUartNo);
 /************************************************************/
 
 
@@ -55,19 +62,47 @@
 /************************************************************/
 /*
 Init_UART1
-	Initialise the UART with RX interrupt 
+	Initialise the UART module with no flow control, Autobaud OFF
 
 	INPUT 		: 
-				-None
+				ubUartNo : Uart Interface that need to be initialise
+				sUartParam : Uart Parameters to be configure
 				
 	OUTPUT 		:	
 				-None				
 				
-
+	uint8 BRGH
+	uint8 Parity;
+	uint8 StopBit;
+	uint8 BaudRate;
 */
-void Init_UART1(void)
+void UartInit(uint8 ubUartNo, sUartParam* sUartParam)
 {
+	uint8 ubValid = TRUE;
+	sUartInit* sUartInit= NULL;
+	
+	ubValid = IrUartIterfaceValid;
+	if(ubValid)
+	{
+		sUartInit = UartBase[ubUartNo];
+		sUartInit->Uxmode = 0x00;	
+		
+		/*Polarity*/
+		sUartInit->Uxmode |= (4<<(sUartParam->RxPolarity));
 
+		/*BRGH*/
+		sUartInit->Uxmode |= (3<<(sUartParam->BRGH));
+		
+		/*Parity*/
+		sUartInit->Uxmode |= (2<<(sUartParam->Parity));
+		
+		/*Stop bits*/
+		sUartInit->Uxmode |= (sUartParam->StopBit);
+		
+		/*Baudrate*/
+		sUartInit->Uxbrg =  sUartParam->BaudRate;
+		
+	}
 }
 /************************************************************/
 
@@ -75,6 +110,16 @@ void Init_UART1(void)
 /************************************************************/
 /*				    PRIVATES FUNCTIONS			 			*/
 /************************************************************/
+bool IsUartInterfaceValid(uint8 ubUartNo)
+{
+	uint8 ubValid = FALSE;
 
+	if(ubUartNo <= NBUART)
+	{
+		ubValid = TRUE;
+	}
+	
+	return ubValid;
+}
 /************************************************************/
 
