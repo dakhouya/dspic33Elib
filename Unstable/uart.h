@@ -80,12 +80,13 @@ typedef struct Param
 typedef struct UartPort
 {
 	uint8 	Uartno;
-	uint8	TxMessage[UART_BUFFER_SIZE];
+	uint8	TxBuffer[UART_BUFFER_SIZE];
+	uint8	RxBuffer[UART_BUFFER_SIZE];
 	uint8	TxMessageLength;
-	uint8*	RxMessage;
+	uint8	RxMessageLength;
 	uint8	TxIsBusy;
-	void	(*Txfct)(void);
-	void	(*Rxfct)(void); 
+	void	(*Txfct)(uint8 ubUartNo, uint8 ubChar);
+	void	(*Rxfct)(uint8 ubUartNo, uint8 ubChar); 
 }sUartPort_t;
 
 typedef struct UartInit
@@ -117,8 +118,10 @@ typedef struct UartInit
 /*				     PUBLIC PROTOTYPES			 			*/
 /************************************************************/
 void UartInit(uint8 ubUartNo, sUartParam*)
-void UartInitPort(sUartPort_t* sUartPort);
-void UartEcho(&ubChar ubChar);
+void UartInitPortStruc(sUartPort_t* sUartPort, 
+					   void (*Txfct)(uint8 ubUartNo, uint8 ubChar), 
+					   void (*Rxfct)(uint8 ubUartNo, uint8 ubChar));
+void UartEcho(ubChar ubChar);
 void UartTxFrame(sUartPort_t* sUartPort);
 
 void UartRxEnable(uint8 ubUartNo, bool state);
