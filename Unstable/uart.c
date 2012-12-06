@@ -86,13 +86,13 @@ void UartInit(uint8 ubUartNo, sUartParam_t* sUartParam)
 		sUartInit->Uxrxreg 	= 	0x0000;		
 		
 		/*Polarity*/
-		sUartInit->Uxmode |= (4<<(sUartParam->RxPolarity));
+		sUartInit->Uxmode |= ((sUartParam->RxPolarity)<<4);
 
 		/*BRGH*/
-		sUartInit->Uxmode |= (3<<(sUartParam->BRGH));
+		sUartInit->Uxmode |= ((sUartParam->BRGH)<<3);
 		
 		/*Parity*/
-		sUartInit->Uxmode |= (2<<(sUartParam->Parity));
+		sUartInit->Uxmode |= ((sUartParam->Parity)<<2);
 		
 		/*Stop bits*/
 		sUartInit->Uxmode |= (sUartParam->StopBit);
