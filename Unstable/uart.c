@@ -25,13 +25,13 @@
 /************************************************************/
 /*			        STRUCTURE DEFINITIONS			 		*/
 /************************************************************/
-const uint16 UartBase[]
+const uint16 UartBase[] =
 {
-	REVERVED0 = 0;
-	UARTBASE1 = (sUartInit_t*)0x0220,	/*Address 0x0220*/
-	UARTBASE2 = (sUartInit_t*)0x0230,	/*Address 0x0230*/
-	UARTBASE3 = (sUartInit_t*)0x0250,	/*Address 0x0250*/
-	UARTBASE4 = (sUartInit_t*)0x02B0	/*Address 0x02B0*/
+	0x0000,
+	0x0220,	/*Address 0x0220*/
+	0x0230,	/*Address 0x0230*/
+	0x0250,	/*Address 0x0250*/
+	0x02B0	/*Address 0x02B0*/
 };
 /************************************************************/
 
@@ -71,12 +71,12 @@ Init_UART
 	OUTPUT 		:	
 				-None				
 */
-void UartInit(uint8 ubUartNo, sUartParam* sUartParam)
+void UartInit(uint8 ubUartNo, sUartParam_t* sUartParam)
 {
 	uint8 ubValid = TRUE;
-	sUartInit* sUartInit= NULL;
+	sUartInit_t* sUartInit= NULL;
 	
-	ubValid = IrUartIterfaceValid(ubUartNo);
+	ubValid = IsUartInterfaceValid(ubUartNo);
 	if(ubValid)
 	{
 		sUartInit = UartBase[ubUartNo];
@@ -119,6 +119,7 @@ void UartInitPortStruc(sUartPort_t* sUartPort,
 					   void (*pTxfct)(uint8 ubUartNo, uint8 ubChar), 
 					   void (*pRxfct)(uint8 ubUartNo, uint8 ubChar))
 {
+	uint8 counter;
 	/*Initialise all parameters to 0*/
 	sUartPort->Uartno = 0;
 	for(counter = 0; counter<UART_BUFFER_SIZE;++counter)
@@ -131,7 +132,7 @@ void UartInitPortStruc(sUartPort_t* sUartPort,
 	sUartPort->TxIsBusy = 0;
 	
 	/*Configure callback function if necessary*/
-	if(Rxfct != NULL)
+	if(pRxfct != NULL)
 	{
 		sUartPort->Rxfct = pRxfct;
 	}
@@ -140,7 +141,7 @@ void UartInitPortStruc(sUartPort_t* sUartPort,
 		sUartPort->Rxfct = NULL;
 	}
 	
-	if(Txfct != NULL)
+	if(pTxfct != NULL)
 	{
 		sUartPort->Txfct = pTxfct;	
 	}
@@ -165,4 +166,12 @@ bool IsUartInterfaceValid(uint8 ubUartNo)
 	return ubValid;
 }
 /************************************************************/
+
+/************************************************************/
+/*				  		  INTERRUPT	   			 			*/
+/************************************************************/
+void __attribute__((interrupt, auto_psv)) _U1RXInterrupt(void)
+{
+
+}
 

@@ -28,7 +28,7 @@
 /*			           MACRO DEFINITIONS			 		*/
 /************************************************************/
 /*Should be in hardware profil definitions*/
-#define ifndef CPU_CLOCK
+#ifndef CPU_CLOCK
 #define CPU_CLOCK 				120000000
 #endif
 
@@ -43,16 +43,16 @@
 
 /*UartParam*/
 #define	BRGH_LOW_SPEED			0
-#define	BRGH_LOW_SPEED			1
+#define	BRGH_HIGH_SPEED			1
 
-#define 8BITS_NOPARITY			0
-#define 8BITS_EVENPARITY		1
-#define 8BITS_ODDPARITY			2
-#define 9BITS_NOPARITY 			3
+#define UART_8BITS_NOPARITY			0
+#define UART_8BITS_EVENPARITY		1
+#define UART_8BITS_ODDPARITY			2
+#define UART_9BITS_NOPARITY 			3
 
-#define	2STOP_BITS				0
-#define	1STOP_BIT				1
-
+#define	UART_2STOP_BITS				0
+#define	UART_1STOP_BIT				1
+/*
 #define 2400BAUD				BAUDRATE(2400)
 #define 4800BAUD				BAUDRATE(4800)
 #define 9600BAUD				BAUDRATE(9600)
@@ -60,7 +60,7 @@
 #define 19600BAUD				BAUDRATE(19600)
 #define 38400BAUD				BAUDRATE(38400)	
 #define 57600BAUD				BAUDRATE(57600)
-#define 115200BAUD				BAUDRATE(115200)	
+#define 115200BAUD				BAUDRATE(115200)*/	
 /************************************************************/
 
 
@@ -74,7 +74,7 @@ typedef struct Param
 	uint8 Parity;
 	uint8 StopBit;
 	uint8 BaudRate;
-}sUartParam;
+}sUartParam_t;
 
 
 typedef struct UartPort
@@ -117,11 +117,11 @@ typedef struct UartInit
 /************************************************************/
 /*				     PUBLIC PROTOTYPES			 			*/
 /************************************************************/
-void UartInit(uint8 ubUartNo, sUartParam*)
+void UartInit(uint8 ubUartNo, sUartParam_t*);
 void UartInitPortStruc(sUartPort_t* sUartPort, 
 					   void (*Txfct)(uint8 ubUartNo, uint8 ubChar), 
 					   void (*Rxfct)(uint8 ubUartNo, uint8 ubChar));
-void UartEcho(ubChar ubChar);
+void UartEcho(uint8 ubChar);
 void UartTxFrame(sUartPort_t* sUartPort);
 
 void UartRxEnable(uint8 ubUartNo, bool state);
