@@ -1,13 +1,12 @@
 /************************************************************/
-/* I2C.h													*/
-/* Library for the I2C module of the MCU DSPIC30F5011 		*/
-/* Monitoring circuit(V1.0)									*/
+/* i2c.h													*/
+/* Library for the I2C module of dspic33E			 		*/
 /*															*/
-/* MCU : DSPIC30F5011										*/
+/* MCU : dspic33E											*/
 /*															*/
-/* Author : David Khouya, Chinook 2							*/
-/* Date	  :	03/05/2012										*/
-/* Version: 0.1												*/
+/* Author : David Khouya									*/
+/* Date	  :	xx/1/2012										*/
+/* Version: 1.0 											*/
 /************************************************************/
 
 /************************************************************/
@@ -19,82 +18,58 @@
 /*						   INCLUDES			 				*/
 /************************************************************/
 #include"p33EP512MC806.h"
+#include "globaldef.h"
 #include "hardware_profile.h"
 /************************************************************/
 
 /************************************************************/
-/*				       PUBLIC FUNCTIONS			 			*/
+/*			           MACRO DEFINITIONS			 		*/
 /************************************************************/
-/*
-Init_I2C
-	Initialise the I2C module 
+/*Should be in hardware profil definitions*/
+#ifndef CPU_CLOCK
+#define CPU_CLOCK 				20000000.0f
+#endif
 
-	INPUT 		: 
-				-None
-				
-	OUTPUT 		:	
-				-None
-				
-	EFFECT 		:
-				-Initialise the I2C module
+/*Macro for I2C bus speed calculation*/
+#define I2CSPEED(DESIREDSPEED)  ((1.0f/((1.0f/(CPU_CLOCK/2.0f))*(DESIREDSPEED)))-1.0f)
+	
+/*Number of I2C interfaces*/
+#define NB_I2C					2
 
-	SPEC		: 	
-				-Interrupt are not enable
-				-ERRATA : DSPIC30F5011 should work at 20MIPS or less
-				
-	CALL Example:
+/*Interface for user*/
+#define I2C_1					0
+#define I2C_2					1
 
-*/
-void Init_I2C(void);
 /************************************************************/
-/*
-I2C_Send
-	Send data to a slave on I2C bus
 
-	INPUT 		: 
-				-(unsigned char) Slave address
-				-(unsigned char) Slave Register
-				-(unsigned char) Data that will be written in the register
-				
-	OUTPUT 		:	
-				-(char) operation status : >=0 OK, -1 Fail
-				
-	EFFECT 		:
-				-This routine can't be interrupt
 
-	SPEC		: 	
-				-This function is working with 8bits address,register and data only
-				
-				
-	CALL Example:
-
-*/
-char I2C_Send(unsigned char address,unsigned char reg,unsigned char data);
 /************************************************************/
-/*
-I2C_receive
-	Read data from a slave on I2C bus
+/*			        STRUCTURE DEFINITIONS			 		*/
+/************************************************************/
 
-	INPUT 		: 
-				-(unsigned char) Slave write address
-				-(unsigned char) Slave read address
-				-(unsigned char) Slave register 
-				-(unsigned char*) variable for the receive byte
-				
-	OUTPUT 		:	
-				-(char) operation status : >=0 OK, -1 Fail
-				
-	EFFECT 		:
-				-This routine can't be interrupt
+/************************************************************/
 
-	SPEC		: 	
-				-This function is working with 8bits addresses and data only
-				
-				
-	CALL Example:
 
-*/
-char I2C_Receive(unsigned char address_w,unsigned char address_r,unsigned char reg,unsigned char * data);
+/************************************************************/
+/*			          PUBLIC VARIABLES			 			*/
+/************************************************************/
+
+/************************************************************/
+
+
+/************************************************************/
+/*			         PRIVATE VARIABLES			 			*/
+/************************************************************/
+
+/************************************************************/
+
+
+/************************************************************/
+/*				     PUBLIC PROTOTYPES			 			*/
+/************************************************************/
+bool I2C_Init(uint8 ubI2cNo, float fSpeed);
+bool I2C_Send(uint8 ubAddress,uint8 ubRegister,uint8 ubData, uint8 ubI2cNo);
+bool I2C_Receive(uint8 ubAddressWrite,uint8 ubAddressRead,uint8 ubRegister,uint8* ubData, uint8 ubI2cNo);
 /************************************************************/
 
 /************************************************************/
