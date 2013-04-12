@@ -1,43 +1,22 @@
 /************************************************************/
-/* uart.c													*/
-/* Library for the UART module of dspic33E			 		*/
-/*															*/
-/* MCU : dspic33E											*/
-/*															*/
-/* Author : David Khouya									*/
-/* Date	  :	25/01/2012										*/
-/* Version: 1.0												*/
+/* uart.c                                                   */
+/* Library for the UART module of dspic33E                  */
+/*                                                          */
+/* MCU : dspic33E                                           */
+/*                                                          */
+/* Author : David Khouya                                    */
+/* Date	  : 12/04/2013                                      */
 /************************************************************/
 
 /************************************************************/
-/*						   INCLUDES			 				*/
+/*			INCLUDES                            */
 /************************************************************/
 #include "uart.h"
 /************************************************************/
 
-/************************************************************/
-/*			           MACRO DEFINITIONS			 		*/
-/************************************************************/
 
 /************************************************************/
-
-
-/************************************************************/
-/*			        STRUCTURE DEFINITIONS			 		*/
-/************************************************************/
-
-/************************************************************/
-
-
-/************************************************************/
-/*			          PUBLIC VARIABLES			 			*/
-/************************************************************/
-
-/************************************************************/
-
-
-/************************************************************/
-/*			         PRIVATE VARIABLES			 			*/
+/*                  PRIVATE VARIABLES                       */
 /************************************************************/
 /*Base address*/
 const static sUartInit_t* UartBase[] =
@@ -49,87 +28,87 @@ const static sUartInit_t* UartBase[] =
 };
 
 /*Interrupt Addresses*/
-volatile static uint16* Iecx[] =
+static uint16_t* Iecx[] =
 {
-	(uint16*)0x0820,
-	(uint16*)0x0822,
-	(uint16*)0x0824,
-	(uint16*)0x0826,
-	(uint16*)0x0828,
-	(uint16*)0x082A,
-	(uint16*)0x082C,
-	(uint16*)0x082E,
-	(uint16*)0x0830
+	(uint16_t*)0x0820,
+	(uint16_t*)0x0822,
+	(uint16_t*)0x0824,
+	(uint16_t*)0x0826,
+	(uint16_t*)0x0828,
+	(uint16_t*)0x082A,
+	(uint16_t*)0x082C,
+	(uint16_t*)0x082E,
+	(uint16_t*)0x0830
 };
 
 /*Flags Adresses*/
-volatile static uint16* Ifsx[] =
+static uint16_t* Ifsx[] =
 {
-	(uint16*)0x0800,
-	(uint16*)0x0802,
-	(uint16*)0x0804,
-	(uint16*)0x0806,
-	(uint16*)0x0808,
-	(uint16*)0x080A,
-	(uint16*)0x080C,
-	(uint16*)0x080E,
-	(uint16*)0x0810
+	(uint16_t*)0x0800,
+	(uint16_t*)0x0802,
+	(uint16_t*)0x0804,
+	(uint16_t*)0x0806,
+	(uint16_t*)0x0808,
+	(uint16_t*)0x080A,
+	(uint16_t*)0x080C,
+	(uint16_t*)0x080E,
+	(uint16_t*)0x0810
 };
 
 /*Interrupt Priority Adresses*/
-volatile static uint16* Ipcx[] =
+static uint16_t* Ipcx[] =
 {
-	(uint16*)0x0840,
-	(uint16*)0x0842,
-	(uint16*)0x0844,
-	(uint16*)0x0846,
-	(uint16*)0x0848,
-	(uint16*)0x084A,
-	(uint16*)0x084C,
-	(uint16*)0x084E,
-	(uint16*)0x0850,
-	(uint16*)0x0852,
-	(uint16*)0x0854,
-	(uint16*)0x0856,
-	(uint16*)0x0858,
-	(uint16*)0x085A,
-	(uint16*)0x085C,
-	(uint16*)0x085E,
-	(uint16*)0x0860,
-	(uint16*)0x0862,
-	(uint16*)0x0864,
-	(uint16*)0x0866,
-	(uint16*)0x0868,
-	(uint16*)0x086A,
-	(uint16*)0x086C,
-	(uint16*)0x086E,
-	(uint16*)0x0870,
-	(uint16*)0x0872,
-	(uint16*)0x0874,
-	(uint16*)0x0876,
-	(uint16*)0x0878,
-	(uint16*)0x087A,
-	(uint16*)0x087C,
-	(uint16*)0x087E,
-	(uint16*)0x0880,
-	(uint16*)0x0882,
-	(uint16*)0x0884,
-	(uint16*)0x0886
+	(uint16_t*)0x0840,
+	(uint16_t*)0x0842,
+	(uint16_t*)0x0844,
+	(uint16_t*)0x0846,
+	(uint16_t*)0x0848,
+	(uint16_t*)0x084A,
+	(uint16_t*)0x084C,
+	(uint16_t*)0x084E,
+	(uint16_t*)0x0850,
+	(uint16_t*)0x0852,
+	(uint16_t*)0x0854,
+	(uint16_t*)0x0856,
+	(uint16_t*)0x0858,
+	(uint16_t*)0x085A,
+	(uint16_t*)0x085C,
+	(uint16_t*)0x085E,
+	(uint16_t*)0x0860,
+	(uint16_t*)0x0862,
+	(uint16_t*)0x0864,
+	(uint16_t*)0x0866,
+	(uint16_t*)0x0868,
+	(uint16_t*)0x086A,
+	(uint16_t*)0x086C,
+	(uint16_t*)0x086E,
+	(uint16_t*)0x0870,
+	(uint16_t*)0x0872,
+	(uint16_t*)0x0874,
+	(uint16_t*)0x0876,
+	(uint16_t*)0x0878,
+	(uint16_t*)0x087A,
+	(uint16_t*)0x087C,
+	(uint16_t*)0x087E,
+	(uint16_t*)0x0880,
+	(uint16_t*)0x0882,
+	(uint16_t*)0x0884,
+	(uint16_t*)0x0886
 };
 
-static volatile sUartPort_t sUartPorts[NBUART] = {0};
+volatile sUartPort_t sUartPorts[NBUART] = {0};
 /************************************************************/
 
 
 /************************************************************/
-/*			         PRIVATE PROTOTYPES			 			*/
+/*                  PRIVATE PROTOTYPES                      */
 /************************************************************/
-bool IsUartInterfaceValid(uint8 ubUartNo);
+bool IsUartInterfaceValid(uint8_t ubUartNo);
 /************************************************************/
 
 
 /************************************************************/
-/*				     PUBLIC FUNCTIONS			 			*/
+/*                  PUBLIC FUNCTIONS                        */
 /************************************************************/
 /*
 Init_UART
@@ -143,9 +122,9 @@ Init_UART
 				-None				
 */
 /************************************************************/
-void UartInit(uint8 ubUartNo, sUartParam* sUartParam)
+void UartInit(uint8_t ubUartNo, sUartParam* sUartParam)
 {
-	uint8 ubValid = TRUE;
+	uint8_t ubValid = TRUE;
 	sUartInit_t* sUartInit= NULL;
 	
 	ubValid = IsUartInterfaceValid(ubUartNo);
@@ -170,11 +149,10 @@ void UartInit(uint8 ubUartNo, sUartParam* sUartParam)
 		sUartInit->Uxmode |= (sUartParam->StopBit);
 		
 		/*Baudrate*/
-		sUartInit->Uxbrg =  sUartParam->BaudRate;
+		sUartInit->Uxbrg = sUartParam->BaudRate;
 
 		/*Start Uart module*/
 		sUartInit->Uxmode |= UARTEN;
-		
 	}
 }
 
@@ -189,13 +167,13 @@ UartInitPortStruc
 				-None				
 */
 /************************************************************/
-void UartInitPortStruc(uint8 ubUartNo, 
-					   void (*pTxfct)(uint8 ubUartNo, uint8 ubChar), 
-					   void (*pRxfct)(uint8 ubUartNo, uint8 ubChar))
+void UartInitPortStruc(uint8_t ubUartNo,
+					   void (*pTxfct)(uint8_t ubUartNo, uint8_t ubChar),
+					   void (*pRxfct)(uint8_t ubUartNo, uint8_t ubChar))
 {
-	uint16 usCounter;
-	uint8 ubValid = FALSE;
-	uint8 ubValidUartNo = 0xFF;
+	uint16_t usCounter;
+	uint8_t ubValid = FALSE;
+	uint8_t ubValidUartNo = 0xFF;
 	
 	/*Validity Check*/
 	ubValid = IsUartInterfaceValid(ubUartNo);
@@ -244,10 +222,10 @@ UartEcho
 				-None				
 */
 /************************************************************/
-void UartEcho(uint8 ubUartNo)
+void UartEcho(uint8_t ubUartNo)
 {
-	uint8 ubCounter;
-	uint8 ubValid = FALSE;
+	uint8_t ubCounter;
+	uint8_t ubValid = FALSE;
 	sUartInit_t* sUartReg = NULL;
 
 	/*Validity Check*/
@@ -279,11 +257,11 @@ UartTxFrame
 				-None				
 */
 /************************************************************/
-void UartTxFrame(uint8 ubUartNo, uint8* ubString, uint8 ubLength)
+void UartTxFrame(uint8_t ubUartNo, uint8_t* ubString, uint8_t ubLength)
 {
 
-	uint8 ubCounter;
-	uint8 ubValid = FALSE;
+	uint8_t ubCounter;
+	uint8_t ubValid = FALSE;
 	sUartInit_t* sUartReg = NULL;
 
 	/*Validity Check*/
@@ -319,9 +297,9 @@ UartTxEnable
 				-None				
 */
 /************************************************************/
-void UartTxEnable(uint8 ubUartNo, bool bState)
+void UartTxEnable(uint8_t ubUartNo, bool bState)
 {
-	uint8 ubValid = TRUE;
+	uint8_t ubValid = TRUE;
 	sUartInit_t* sUartReg= NULL;
 	
 	ubValid = IsUartInterfaceValid(ubUartNo);
@@ -353,9 +331,9 @@ UartInterruptRxEnable
 				-None				
 */
 /************************************************************/
-void UartInterruptRxEnable(uint8 ubUartNo, uint16 usMode, uint8 ubPriority, bool bState)
+void UartInterruptRxEnable(uint8_t ubUartNo, uint16_t usMode, uint8_t ubPriority, bool bState)
 {
-	uint8 ubValid = TRUE;
+	uint8_t ubValid = TRUE;
 	sUartInit_t* sUartReg= NULL;
 	
 	/*Validity check*/
@@ -375,22 +353,22 @@ void UartInterruptRxEnable(uint8 ubUartNo, uint16 usMode, uint8 ubPriority, bool
 			switch(ubUartNo)
 			{
 				case UART_1:
-				*Ipcx[2] |= (uint16)ubPriority<<12;
+				*Ipcx[2] |= (uint16_t)ubPriority<<12;
 				*Iecx[0] |= U1RXIE;
 				break;
 	
 				case UART_2:
-				*Ipcx[7] |= (uint16)ubPriority<<8;
+				*Ipcx[7] |= (uint16_t)ubPriority<<8;
 				*Iecx[1] |= U2RXIE;
 				break;
 	
 				case UART_3:
-				*Ipcx[20] |= (uint16)ubPriority<<8;
+				*Ipcx[20] |= (uint16_t)ubPriority<<8;
 				*Iecx[5] |= U3RXIE;
 				break;
 	
 				case UART_4:
-				*Ipcx[22] |= (uint16)ubPriority;
+				*Ipcx[22] |= (uint16_t)ubPriority;
 				*Iecx[5] |= U4RXIE;
 				break;
 
@@ -403,22 +381,22 @@ void UartInterruptRxEnable(uint8 ubUartNo, uint16 usMode, uint8 ubPriority, bool
 			switch(ubUartNo)
 			{
 				case UART_1:
-				*Ipcx[2] |= (uint16)ubPriority<<12;
+				*Ipcx[2] |= (uint16_t)ubPriority<<12;
 				*Iecx[0] &= ~U1RXIE;
 				break;
 	
 				case UART_2:
-				*Ipcx[7] |= (uint16)ubPriority<<8;
+				*Ipcx[7] |= (uint16_t)ubPriority<<8;
 				*Iecx[1] &= ~U2RXIE;
 				break;
 	
 				case UART_3:
-				*Ipcx[20] |= (uint16)ubPriority<<8;
+				*Ipcx[20] |= (uint16_t)ubPriority<<8;
 				*Iecx[5] &= ~U3RXIE;
 				break;
 	
 				case UART_4:
-				*Ipcx[22] |= (uint16)ubPriority;
+				*Ipcx[22] |= (uint16_t)ubPriority;
 				*Iecx[5] &= ~U4RXIE;
 				break;
 
@@ -442,9 +420,9 @@ UartInterruptTxEnable
 				-None				
 */
 /************************************************************/
-void UartInterruptTxEnable(uint8 ubUartNo, uint16 usMode, uint8 ubPriority, bool bState)
+void UartInterruptTxEnable(uint8_t ubUartNo, uint16_t usMode, uint8_t ubPriority, bool bState)
 {
-	uint8 ubValid = TRUE;
+	uint8_t ubValid = TRUE;
 	sUartInit_t* sUartReg= NULL;
 	
 	/*Validity check*/
@@ -464,22 +442,22 @@ void UartInterruptTxEnable(uint8 ubUartNo, uint16 usMode, uint8 ubPriority, bool
 			switch(ubUartNo)
 			{
 				case UART_1:
-				*Ipcx[3] |= (uint16)ubPriority;
+				*Ipcx[3] |= (uint16_t)ubPriority;
 				*Iecx[0] |= U1TXIE;
 				break;
 	
 				case UART_2:
-				*Ipcx[7] |= (uint16)ubPriority<<12;
+				*Ipcx[7] |= (uint16_t)ubPriority<<12;
 				*Iecx[1] |= U2TXIE;
 				break;
 	
 				case UART_3:
-				*Ipcx[20] |= (uint16)ubPriority<<12;
+				*Ipcx[20] |= (uint16_t)ubPriority<<12;
 				*Iecx[5] |= U3TXIE;
 				break;
 	
 				case UART_4:
-				*Ipcx[22] |= (uint16)ubPriority<<4;
+				*Ipcx[22] |= (uint16_t)ubPriority<<4;
 				*Iecx[5] |= U4TXIE;
 				break;
 
@@ -492,22 +470,22 @@ void UartInterruptTxEnable(uint8 ubUartNo, uint16 usMode, uint8 ubPriority, bool
 			switch(ubUartNo)
 			{
 				case UART_1:
-				*Ipcx[3] |= (uint16)ubPriority;
+				*Ipcx[3] |= (uint16_t)ubPriority;
 				*Iecx[0] &= ~U1TXIE;
 				break;
 	
 				case UART_2:
-				*Ipcx[7] |= (uint16)ubPriority<<12;
+				*Ipcx[7] |= (uint16_t)ubPriority<<12;
 				*Iecx[1] &= ~U2TXIE;
 				break;
 	
 				case UART_3:
-				*Ipcx[20] |= (uint16)ubPriority<<12;
+				*Ipcx[20] |= (uint16_t)ubPriority<<12;
 				*Iecx[5] &= ~U3TXIE;
 				break;
 	
 				case UART_4:
-				*Ipcx[22] |= (uint16)ubPriority<<4;
+				*Ipcx[22] |= (uint16_t)ubPriority<<4;
 				*Iecx[5] &= ~U4TXIE;
 				break;
 
@@ -528,9 +506,9 @@ UartInterruptTx
 				-None				
 */
 /************************************************************/
-void UartInterruptTx(uint8 ubUartNo)
+void UartInterruptTx(uint8_t ubUartNo)
 {
-	uint8 ubCounter;
+	uint8_t ubCounter;
 
 	sUartInit_t* sUartReg = NULL;
 	sUartReg = (sUartInit_t*)UartBase[ubUartNo];
@@ -572,7 +550,7 @@ UartInterruptRx
 				-None				
 */
 /************************************************************/
-void UartInterruptRx(uint8 ubUartNo)
+void UartInterruptRx(uint8_t ubUartNo)
 {
 	sUartInit_t* sUartReg = NULL;
 	sUartReg = (sUartInit_t*)UartBase[ubUartNo];
@@ -587,9 +565,9 @@ void UartInterruptRx(uint8 ubUartNo)
 /************************************************************/
 /*				    PRIVATES FUNCTIONS			 			*/
 /************************************************************/
-bool IsUartInterfaceValid(uint8 ubUartNo)
+bool IsUartInterfaceValid(uint8_t ubUartNo)
 {
-	uint8 ubValid = FALSE;
+	uint8_t ubValid = FALSE;
 
 	if(ubUartNo < NBUART)
 	{
@@ -601,46 +579,46 @@ bool IsUartInterfaceValid(uint8 ubUartNo)
 /************************************************************/
 
 /************************************************************/
-/*				    INTERRUPT FUNCTIONS			 			*/
+/*                  INTERRUPT FUNCTIONS                     */
 /************************************************************/
-void __attribute__((__interrupt__)) _U1TXInterrupt(void)
+void __attribute__((interrupt, auto_psv)) _U1TXInterrupt(void)
 {
 	UartInterruptTx(UART_1);
 	*Ifsx[0] &= ~(U1TXIF); // clear TX interrupt flag
 }
 /************************************************************/
-void __attribute__((__interrupt__)) _U1RXInterrupt(void)
+void __attribute__((interrupt, auto_psv)) _U1RXInterrupt(void)
 {
 	UartInterruptRx(UART_1);
 	*Ifsx[0] &= ~(U1RXIF); // clear RX interrupt flag
 }
 /************************************************************/
-void __attribute__((__interrupt__)) _U2TXInterrupt(void)
+void __attribute__((interrupt, auto_psv)) _U2TXInterrupt(void)
 {
 	*Ifsx[1] &= ~(U2TXIF); // clear TX interrupt flag
 }
 /************************************************************/
-void __attribute__((__interrupt__)) _U2RXInterrupt(void)
+void __attribute__((interrupt, auto_psv)) _U2RXInterrupt(void)
 {
 	*Ifsx[1] &= ~(U2RXIF); // clear TX interrupt flag
 }
 /************************************************************/
-void __attribute__((__interrupt__)) _U3TXInterrupt(void)
+void __attribute__((interrupt, auto_psv)) _U3TXInterrupt(void)
 {
 	*Ifsx[5] &= ~(U3TXIF); // clear TX interrupt flag
 }
 /************************************************************/
-void __attribute__((__interrupt__)) _U3RXInterrupt(void)
+void __attribute__((interrupt, auto_psv)) _U3RXInterrupt(void)
 {
 	*Ifsx[5] &= ~(U3RXIF); // clear TX interrupt flag
 }
 /************************************************************/
-void __attribute__((__interrupt__)) _U4TXInterrupt(void)
+void __attribute__((interrupt, auto_psv)) _U4TXInterrupt(void)
 {
 	*Ifsx[5] &= ~(U4TXIF); // clear TX interrupt flag
 }
 /************************************************************/
-void __attribute__((__interrupt__)) _U4RXInterrupt(void)
+void __attribute__((interrupt, auto_psv)) _U4RXInterrupt(void)
 {
 	*Ifsx[5] &= ~(U4RXIF); // clear TX interrupt flag
 }
