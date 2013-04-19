@@ -5,7 +5,7 @@
 /* MCU : dspic33E                                           */
 /*                                                          */
 /* Author : David Khouya                                    */
-/* Date	  : 12/04/2013                                      */
+/* Date	  : 19/04/2013                                      */
 /************************************************************/
 
 /************************************************************/
@@ -29,47 +29,42 @@
 #define CPU_CLOCK 				20000000.0f
 #endif*/
 
-#define UART_BUFFER_SIZE                        256
-#define NBUART 					4
+#define UART_BUFFER_SIZE           	256
+#define NBUART 						4
 
-#define UART_1					0
-#define UART_2					1
-#define UART_3					2
-#define UART_4					3
-
-/*For BRGH = 1*/
-#define BAUDRATE(BAUD) 				((((FOSC/2.0f)/BAUD)/16)-1)
-/*For BRGH = 0*/
-//#define BAUDRATE(BAUD) 			((CPU_CLOCK/BAUD)/4.0f)-1.0f
+#define UART_1						0
+#define UART_2						1
+#define UART_3						2
+#define UART_4						3
 
 /*UartParam*/
 #define	BRGH_LOW_SPEED				0
 #define	BRGH_HIGH_SPEED				1
 
 #define UART_8BITS_NOPARITY			0
-#define UART_8BITS_EVENPARITY                   1
-#define UART_8BITS_ODDPARITY                    2
-#define UART_9BITS_NOPARITY                     3
+#define UART_8BITS_EVENPARITY       1
+#define UART_8BITS_ODDPARITY        2
+#define UART_9BITS_NOPARITY         3
 
 #define	UART_2STOP_BITS				0
 #define	UART_1STOP_BIT				1
 
-#define UART_2400BAUD				BAUDRATE(2400)
-#define UART_4800BAUD				BAUDRATE(4800)
-#define UART_9600BAUD				BAUDRATE(9600)
-#define UART_14400BAUD				BAUDRATE(14400)
-#define UART_19600BAUD				BAUDRATE(19600)
-#define UART_38400BAUD				BAUDRATE(38400)	
-#define UART_57600BAUD				BAUDRATE(57600)
-#define UART_115200BAUD				BAUDRATE(115200)	
+#define UART_2400BAUD				2400.0f
+#define UART_4800BAUD				4800.0f
+#define UART_9600BAUD				9600.0f
+#define UART_14400BAUD				14400.0f
+#define UART_19600BAUD				19600.0f
+#define UART_38400BAUD				38400.0f
+#define UART_57600BAUD				57600.0f
+#define UART_115200BAUD				115200.0f	
 
 /*TX Interrupt Mode*/
-#define	CHAR_N_BUFFER_EMPTY			0x8000		
+#define	CHAR_N_BUFFER_EMPTY						0x8000		
 #define	TRANSMIT_OPERATION_COMPLETED            0x2000
 #define ANY_CHAR_N_BUFFER_EMPTY                 0x0000
 
 /*RX Interrupt Mode*/
-#define	BUFFER_FULL                             0x0080	//4 char
+#define	BUFFER_FULL                 0x0080	//4 char
 #define	BUFFER_3_4_FULL				0x0020	//3 char
 #define CHAR_RECEIVE				0x0000	//1 char
 
@@ -154,7 +149,7 @@ typedef struct UartInit
 {
 	uint16_t	Uxmode;
 	uint16_t	Uxsta;
-	uint16_t        Uxtxreg;
+	uint16_t    Uxtxreg;
 	uint16_t	Uxrxreg;
 	uint16_t	Uxbrg;
 }sUartInit_t;

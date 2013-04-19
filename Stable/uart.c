@@ -5,7 +5,7 @@
 /* MCU : dspic33E                                           */
 /*                                                          */
 /* Author : David Khouya                                    */
-/* Date	  : 12/04/2013                                      */
+/* Date	  : 19/04/2013                                      */
 /************************************************************/
 
 /************************************************************/
@@ -124,6 +124,7 @@ Init_UART
 /************************************************************/
 void UartInit(uint8_t ubUartNo, sUartParam* sUartParam)
 {
+	uint16_t usBaudrate;
 	uint8_t ubValid = TRUE;
 	sUartInit_t* sUartInit= NULL;
 	
@@ -142,6 +143,15 @@ void UartInit(uint8_t ubUartNo, sUartParam* sUartParam)
 		/*BRGH*/
 		sUartInit->Uxmode |= (3<<(sUartParam->BRGH));
 		
+		if(sUartParam->BRGH)
+			{
+				usBaudrate = (uint16_t)((((FOSC/2.0f)/sUartParam->BaudRate)/16.0f)-1.0f)
+			}
+		else
+			{
+				usBaudrate = (uint16_t)((((FOSC/2.0f)/sUartParam->BaudRate)/4.0f)-1.0f)
+			}
+			
 		/*Parity*/
 		sUartInit->Uxmode |= (2<<(sUartParam->Parity));
 		
@@ -149,7 +159,7 @@ void UartInit(uint8_t ubUartNo, sUartParam* sUartParam)
 		sUartInit->Uxmode |= (sUartParam->StopBit);
 		
 		/*Baudrate*/
-		sUartInit->Uxbrg = sUartParam->BaudRate;
+		sUartInit->Uxbrg = usBaudrate;
 
 		/*Start Uart module*/
 		sUartInit->Uxmode |= UARTEN;
