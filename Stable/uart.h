@@ -29,22 +29,22 @@
 #define CPU_CLOCK 				20000000.0f
 #endif*/
 
-#define UART_BUFFER_SIZE           	256
-#define NBUART 						4
+#define UART_BUFFER_SIZE                        256
+#define NBUART                                  4
 
-#define UART_1						0
-#define UART_2						1
-#define UART_3						2
-#define UART_4						3
+#define UART_1					0
+#define UART_2					1
+#define UART_3					2
+#define UART_4					3
 
 /*UartParam*/
 #define	BRGH_LOW_SPEED				0
 #define	BRGH_HIGH_SPEED				1
 
 #define UART_8BITS_NOPARITY			0
-#define UART_8BITS_EVENPARITY       1
-#define UART_8BITS_ODDPARITY        2
-#define UART_9BITS_NOPARITY         3
+#define UART_8BITS_EVENPARITY                   1
+#define UART_8BITS_ODDPARITY                    2
+#define UART_9BITS_NOPARITY                     3
 
 #define	UART_2STOP_BITS				0
 #define	UART_1STOP_BIT				1
@@ -59,12 +59,12 @@
 #define UART_115200BAUD				115200.0f	
 
 /*TX Interrupt Mode*/
-#define	CHAR_N_BUFFER_EMPTY						0x8000		
+#define	CHAR_N_BUFFER_EMPTY			0x8000		
 #define	TRANSMIT_OPERATION_COMPLETED            0x2000
 #define ANY_CHAR_N_BUFFER_EMPTY                 0x0000
 
 /*RX Interrupt Mode*/
-#define	BUFFER_FULL                 0x0080	//4 char
+#define	BUFFER_FULL                             0x0080	//4 char
 #define	BUFFER_3_4_FULL				0x0020	//3 char
 #define CHAR_RECEIVE				0x0000	//1 char
 
@@ -129,7 +129,7 @@ typedef struct Param
 	uint8_t RxPolarity;
 	uint8_t Parity;
 	uint8_t StopBit;
-	uint16_t BaudRate;
+	float   BaudRate;
 }sUartParam;
 
 
@@ -149,7 +149,7 @@ typedef struct UartInit
 {
 	uint16_t	Uxmode;
 	uint16_t	Uxsta;
-	uint16_t    Uxtxreg;
+	uint16_t        Uxtxreg;
 	uint16_t	Uxrxreg;
 	uint16_t	Uxbrg;
 }sUartInit_t;

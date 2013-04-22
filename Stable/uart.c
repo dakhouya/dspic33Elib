@@ -126,7 +126,7 @@ void UartInit(uint8_t ubUartNo, sUartParam* sUartParam)
 {
 	uint16_t usBaudrate;
 	uint8_t ubValid = TRUE;
-	sUartInit_t* sUartInit= NULL;
+	sUartInit_t* sUartInit = NULL;
 	
 	ubValid = IsUartInterfaceValid(ubUartNo);
 	if(ubValid)
@@ -135,25 +135,26 @@ void UartInit(uint8_t ubUartNo, sUartParam* sUartParam)
 		/*Clear every UART registers*/
 		sUartInit->Uxmode 	= 	0x0000;
 		sUartInit->Uxsta 	= 	0x0000;
-		sUartInit->Uxrxreg 	= 	0x0000;		
+		sUartInit->Uxrxreg 	= 	0x0000;
+                sUartInit->Uxtxreg 	=       0x0000;
 		
 		/*Polarity*/
-		sUartInit->Uxmode |= (4<<(sUartParam->RxPolarity));
+		sUartInit->Uxmode |= ((sUartParam->RxPolarity)<<4);
 
 		/*BRGH*/
-		sUartInit->Uxmode |= (3<<(sUartParam->BRGH));
+		sUartInit->Uxmode |= ((sUartParam->BRGH)<<3);
 		
-		if(sUartParam->BRGH)
+		if(sUartParam->BRGH == BRGH_LOW_SPEED)
 			{
-				usBaudrate = (uint16_t)((((FOSC/2.0f)/sUartParam->BaudRate)/16.0f)-1.0f)
+				usBaudrate = (uint16_t)((((FOSC/2.0f)/sUartParam->BaudRate)/16.0f)-1.0f);
 			}
 		else
 			{
-				usBaudrate = (uint16_t)((((FOSC/2.0f)/sUartParam->BaudRate)/4.0f)-1.0f)
+				usBaudrate = (uint16_t)((((FOSC/2.0f)/sUartParam->BaudRate)/4.0f)-1.0f);
 			}
 			
 		/*Parity*/
-		sUartInit->Uxmode |= (2<<(sUartParam->Parity));
+		sUartInit->Uxmode |= ((sUartParam->Parity)<<2);
 		
 		/*Stop bits*/
 		sUartInit->Uxmode |= (sUartParam->StopBit);
