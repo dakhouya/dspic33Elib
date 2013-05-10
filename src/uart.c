@@ -606,11 +606,13 @@ void __attribute__((interrupt, auto_psv)) _U1RXInterrupt(void)
 /************************************************************/
 void __attribute__((interrupt, auto_psv)) _U2TXInterrupt(void)
 {
+	UartInterruptTx(UART_2);
 	*Ifsx[1] &= ~(U2TXIF); // clear TX interrupt flag
 }
 /************************************************************/
 void __attribute__((interrupt, auto_psv)) _U2RXInterrupt(void)
 {
+	UartInterruptRx(UART_2);
 	*Ifsx[1] &= ~(U2RXIF); // clear TX interrupt flag
 }
 /************************************************************/
