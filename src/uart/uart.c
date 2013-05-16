@@ -96,7 +96,7 @@ static uint16_t* Ipcx[] =
 	(uint16_t*)0x0886
 };
 
-volatile sUartPort_t sUartPorts[NBUART] = {0};
+volatile sUartPort_t sUartPorts[NBUART];
 /************************************************************/
 
 
@@ -268,7 +268,7 @@ UartTxFrame
 				-None				
 */
 /************************************************************/
-void UartTxFrame(uint8_t ubUartNo, uint8_t* ubString, uint8_t ubLength)
+void UartTxFrame(uint8_t ubUartNo, char* ubString, size_t ubLength)
 {
 
 	uint8_t ubCounter;
@@ -606,13 +606,13 @@ void __attribute__((interrupt, auto_psv)) _U1RXInterrupt(void)
 /************************************************************/
 void __attribute__((interrupt, auto_psv)) _U2TXInterrupt(void)
 {
-	UartInterruptTx(UART_2);
+    UartInterruptTx(UART_2);
 	*Ifsx[1] &= ~(U2TXIF); // clear TX interrupt flag
 }
 /************************************************************/
 void __attribute__((interrupt, auto_psv)) _U2RXInterrupt(void)
 {
-	UartInterruptRx(UART_2);
+    UartInterruptRx(UART_2);
 	*Ifsx[1] &= ~(U2RXIF); // clear TX interrupt flag
 }
 /************************************************************/

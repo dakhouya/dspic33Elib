@@ -1,39 +1,37 @@
 /***********************************************************************
 * lib_CAN.c
-* Cette librairie gère le bus CAN. Il permet la configuration initial du
-* bus, l'envoi et la réception de messages. 
+* Cette librairie gï¿½re le bus CAN. Il permet la configuration initial du
+* bus, l'envoi et la rï¿½ception de messages. 
 * 
-* AUTEUR: 	Etienne Collard-Fréchette (WalkingMachine)
+* AUTEUR: 	Etienne Collard-Frï¿½chette (WalkingMachine)
 * DATE:		1 mars 2011
-* MODIFIÉ:	BAJA ETS (11 oct. 2011)
+* MODIFIï¿½:	BAJA ETS (11 oct. 2011)
 ************************************************************************
 ****************************** INCLUDE *********************************/
-#define DSPIC33F
-#ifdef DSPIC33F
 #include "can.h"
-#include "can_chinook3.h"
-#include "p33EP512MC806.h"
-#include <stdlib.h>
-#include "Setup_commande.h"
-#include "Global.h"
-#include "dma.h"
+#include <p33EP512MC806.h>
+#include "../dma/dma.h"
 
-/* Fonction privée. */
+#ifndef NULL
+#define NULL 0
+#endif
+
+/* Fonction privï¿½e. */
 //static void init_DMA_channel(unsigned int DMA_channel, char direction, unsigned int IRQ, unsigned int PAD, unsigned int offset);
 
 static unsigned int set_SID_reg(unsigned long ID, T_TYPE_ID type_ID, char mask_or_filter);
 
 static unsigned int set_EID_reg(unsigned long ID, T_TYPE_ID type_ID);
 
-/***************** DÉCLARATION DES VARIABLES GLOBALES ******************/
-/* Buffer utilisé dans la DMA. */
+/***************** Dï¿½CLARATION DES VARIABLES GLOBALES ******************/
+/* Buffer utilisï¿½ dans la DMA. */
 
 unsigned int CAN_msg_Buf[32][8] __attribute__((aligned(32 * 16)));
 
 T_CAN_CONFIG config_CAN;
 
-/* Les tableaux suivant contiennent les adresses des différent registres. */
-/* Utilisé pour les accéder plus facilement. */
+/* Les tableaux suivant contiennent les adresses des diffï¿½rent registres. */
+/* Utilisï¿½ pour les accï¿½der plus facilement. */
 /*
 volatile unsigned int * DMAiCON[] = {&DMA0CON, &DMA1CON, &DMA2CON, &DMA3CON, &DMA4CON, &DMA5CON, &DMA6CON, &DMA7CON};
 volatile unsigned int * DMAiPAD[] = {&DMA0PAD, &DMA1PAD, &DMA2PAD, &DMA3PAD, &DMA4PAD, &DMA5PAD, &DMA6PAD, &DMA7PAD};
@@ -62,8 +60,8 @@ volatile int counter_rx;
 volatile int counter_tx;
 /******************************* INIT_CAN *******************************
 * Description : Fonction qui initialise le module CAN. Tous les aspect
-* 	temporelle du module (fréquence, synchronisation) sont ajusté aux 
-*	valeurs par défaut de la librairie.
+* 	temporelle du module (frï¿½quence, synchronisation) sont ajustï¿½ aux 
+*	valeurs par dï¿½faut de la librairie.
 *
 * 	Exemple d'utilisation standard:
 *	init_CAN(CAN_NORMAL, 4, 0, 1, 5);  	
@@ -73,19 +71,19 @@ volatile int counter_tx;
 *							possible: CAN_NORMAL, CAN_LISTEN_ONLY, CAN_LISTEN_ALL, 
 *							CAN_LISTEN_ALL, CAN_LOOPBACK, CAN_DISABLE.
 *
-*	unsigned int nbr_buf_Tx	Nombre de buffer devant être configuré	en Tx. 
-*							Valeurs possibles: 0 à 8.
+*	unsigned int nbr_buf_Tx	Nombre de buffer devant ï¿½tre configurï¿½	en Tx. 
+*							Valeurs possibles: 0 ï¿½ 8.
 *
-*	unsigned int DMA_Rx		Cannal DMA à utiliser pour la réception	de 
-*							messages. Valeurs possibles: 0 à 7.
+*	unsigned int DMA_Rx		Cannal DMA ï¿½ utiliser pour la rï¿½ception	de 
+*							messages. Valeurs possibles: 0 ï¿½ 7.
 *
-*	unsigned int DMA_Tx		Cannal DMA à utiliser pour la transmission de
-*							messages. Valeurs possibles: 0 à 7.
+*	unsigned int DMA_Tx		Cannal DMA ï¿½ utiliser pour la transmission de
+*							messages. Valeurs possibles: 0 ï¿½ 7.
 *
-*	unsigned int int_level	Niveau de priorité d'interruption du CAN. 
-*							Valeurs possibles: 0 à 7. 
-*							Il est recommandé de mettre un niveau 
-*							de priorité élevé.
+*	unsigned int int_level	Niveau de prioritï¿½ d'interruption du CAN. 
+*							Valeurs possibles: 0 ï¿½ 7. 
+*							Il est recommandï¿½ de mettre un niveau 
+*							de prioritï¿½ ï¿½levï¿½.
 *
 * Output :	AUCUN
 *
@@ -95,10 +93,10 @@ void init_CAN(T_CAN_MODE mode, unsigned int nbr_buf_Tx, unsigned int DMA_Rx, uns
 	unsigned int ii;
 	int old_ipl;
 
-	/* Bloque les interrupt le temps de changer le déplacement. */
+	/* Bloque les interrupt le temps de changer le dï¿½placement. */
 	SET_AND_SAVE_CPU_IPL(old_ipl, 7);
 	
-	/* Sélectionne la bonne fenêtre de registre. */
+	/* Sï¿½lectionne la bonne fenï¿½tre de registre. */
 	C1CTRL1bits.WIN = 0;
 	
 	/* Annule tout les messages Tx en attente. */
@@ -117,16 +115,16 @@ void init_CAN(T_CAN_MODE mode, unsigned int nbr_buf_Tx, unsigned int DMA_Rx, uns
 	/* Configure l'utilisation de 32 buffers dans la DMA. */
 	C1FCTRLbits.DMABS = 0b110;
 	
-	/* Les buffers qui ne sont pas utilisé en Tx sont utilisé en FIFO. */
+	/* Les buffers qui ne sont pas utilisï¿½ en Tx sont utilisï¿½ en FIFO. */
 	C1FCTRLbits.FSA = nbr_buf_Tx & 0x001F;
 	
 	/* Efface les flag des buffers et des overflow */
 	C1RXFUL1 = C1RXFUL2 = C1RXOVF1 = C1RXOVF2 = 0x0000;
 	
-	/* Par défaut, met tout les buffers en Rx. */
+	/* Par dï¿½faut, met tout les buffers en Rx. */
 	C1TR01CON = C1TR23CON = C1TR45CON = C1TR67CON = 0x0000;
 	
-	/* Désactive tout les filtres. */
+	/* Dï¿½sactive tout les filtres. */
 	C1FEN1 = 0x0000;
 	
 	/* Tout les filtres pointent vers le FIFO. */
@@ -142,7 +140,7 @@ void init_CAN(T_CAN_MODE mode, unsigned int nbr_buf_Tx, unsigned int DMA_Rx, uns
 
 	config_CAN.nbr_buf_Tx = nbr_buf_Tx;
 	
-	/* Tout les buffer sont assumé comme libre. */
+	/* Tout les buffer sont assumï¿½ comme libre. */
 	for(ii = 0; ii <= 8; ii++)
 	{
 		config_CAN.etat_Buf[ii] = FALSE;
@@ -159,7 +157,7 @@ void init_CAN(T_CAN_MODE mode, unsigned int nbr_buf_Tx, unsigned int DMA_Rx, uns
 	C1INTFbits.TBIF = 0;
 	C1INTFbits.RBIF = 0;	
 	
-	/* Configure le niveau de priotité. */
+	/* Configure le niveau de priotitï¿½. */
 	IPC8bits.C1IP = int_level & 0x0007;
 	
 	/* Active les interruption en transmission et en interruption. */
@@ -167,12 +165,12 @@ void init_CAN(T_CAN_MODE mode, unsigned int nbr_buf_Tx, unsigned int DMA_Rx, uns
 	C1INTEbits.RBIE=1;
 	C1INTEbits.TBIE=1;		
 	
-	/* Met le module dans le mode demandé. */ 
+	/* Met le module dans le mode demandï¿½. */ 
 	/* Attend que le changement soit effectifs. */
 	C1CTRL1bits.REQOP = mode;
 	while(C1CTRL1bits.OPMODE != mode);
 
-	/* Débloque les interupt. */
+	/* Dï¿½bloque les interupt. */
 	RESTORE_CPU_IPL(old_ipl);
 	
 	return;
@@ -183,20 +181,20 @@ void init_CAN(T_CAN_MODE mode, unsigned int nbr_buf_Tx, unsigned int DMA_Rx, uns
 *	CAN.
 *
 * Input :
-*	T_CAN_Tx_MSG * CAN_msg	Pointeur vers la structure CAN à configurer.
+*	T_CAN_Tx_MSG * CAN_msg	Pointeur vers la structure CAN ï¿½ configurer.
 *
 *	unsigned long ID		ID du message.
 *
-*	T_TYPE_ID 	type_ID		Type d'ID utilisée.
+*	T_TYPE_ID 	type_ID		Type d'ID utilisï¿½e.
 *							Valeur possible: STANDARD_ID ou	EXTENDED_ID.
 *
-*	char 		priority	Priorité assigné au message. Cette prioritée
-*							détermine quel message est envoyé en premier.
-*							Valeurs possibles: 0 à 3. 3 étant le plus 
+*	char 		priority	Prioritï¿½ assignï¿½ au message. Cette prioritï¿½e
+*							dï¿½termine quel message est envoyï¿½ en premier.
+*							Valeurs possibles: 0 ï¿½ 3. 3 ï¿½tant le plus 
 *							prioritaire.
 *
 * Output :
-* 	T_CAN_Tx_MSG *			Pointeur vers la structure créer.
+* 	T_CAN_Tx_MSG *			Pointeur vers la structure crï¿½er.
 *
 ************************************************************************/
 void config_CAN_Tx_msg(T_CAN_Tx_MSG * CAN_msg, unsigned long ID, T_TYPE_ID type_ID, unsigned int priority)
@@ -211,18 +209,18 @@ void config_CAN_Tx_msg(T_CAN_Tx_MSG * CAN_msg, unsigned long ID, T_TYPE_ID type_
 
 /***************************** SEND_CAN_MSG ****************************
 * Description : Fonction permettant l'envoie d'un message CAN. Si un
-*	buffer de Tx est disponible, le message y est transférer et la fonction 
+*	buffer de Tx est disponible, le message y est transfï¿½rer et la fonction 
 *	retourne TRUE. Dans le cas contraire, la fonction retourne FALSE.
 *
 * Input :
 *	T_CAN_Tx_MSG * CAN_tx_msg	Pointeur vers la structure du message.
 *
-*	const void * 	data		Pointeur vers les données à envoyer.
+*	const void * 	data		Pointeur vers les donnï¿½es ï¿½ envoyer.
 *
-*	char 			nbr_data	Nombre d'octets à envoyer. Maximum: 8.
+*	char 			nbr_data	Nombre d'octets ï¿½ envoyer. Maximum: 8.
 *
 * Output :
-* 	int						Retourne TRUE si le message a pu être mis dans
+* 	int						Retourne TRUE si le message a pu ï¿½tre mis dans
 *							dans un buffer de Tx. Sinon, retourne FALSE.
 *
 ************************************************************************/
@@ -234,13 +232,13 @@ int send_CAN_msg(T_CAN_Tx_MSG * CAN_tx_msg, const void * data_scr, char nbr_data
 	unsigned int jj;
 	int old_ipl;
 
-	/* Bloque les interrupt le temps de changer le déplacement. */
+	/* Bloque les interrupt le temps de changer le dï¿½placement. */
 	SET_AND_SAVE_CPU_IPL(old_ipl, 7);
 	
-	/* Sélectionne la bonne fenêtre de registre. */
+	/* Sï¿½lectionne la bonne fenï¿½tre de registre. */
 	C1CTRL1bits.WIN = 0;
 	
-	/* Détermine si un buffer de Tx est disponible. */
+	/* Dï¿½termine si un buffer de Tx est disponible. */
 	for(Buf_sel = config_CAN.nbr_buf_Tx - 1; Buf_sel >= 0; Buf_sel--)
 	{
 		if(config_CAN.etat_Buf[Buf_sel] == FALSE)
@@ -253,7 +251,7 @@ int send_CAN_msg(T_CAN_Tx_MSG * CAN_tx_msg, const void * data_scr, char nbr_data
 	/* Si aucun buffer de Tx est disponible, impossible d'envoyer le message. */
 	if(Buf_sel == -1)
 	{	
-		/* Débloque les interupt. */
+		/* Dï¿½bloque les interupt. */
 		RESTORE_CPU_IPL(old_ipl);	
 		return FALSE;
 	}
@@ -278,10 +276,10 @@ int send_CAN_msg(T_CAN_Tx_MSG * CAN_tx_msg, const void * data_scr, char nbr_data
 		word2 = (unsigned int) ((CAN_tx_msg->ID & 0x0001F800) >> 1);	
 	}
 	
-	/* Inscrit le nombre de données contenues dans le message. */
+	/* Inscrit le nombre de donnï¿½es contenues dans le message. */
 	word2 |= (unsigned int) nbr_data & 0x000F;
 	
-	/* Transfers des données vers le buffer sélectionné. */
+	/* Transfers des donnï¿½es vers le buffer sï¿½lectionnï¿½. */
 	CAN_msg_Buf[Buf_sel][0] = word0;
 	CAN_msg_Buf[Buf_sel][1] = word1;
 	CAN_msg_Buf[Buf_sel][2] = word2;
@@ -294,25 +292,25 @@ int send_CAN_msg(T_CAN_Tx_MSG * CAN_tx_msg, const void * data_scr, char nbr_data
 		ptr_dest[jj] = ptr_src[jj];
 	}
 
-	/* Assigne la priorité et active le flag pour transmettre le message. */
+	/* Assigne la prioritï¿½ et active le flag pour transmettre le message. */
 	*(C1TRiCON[Buf_sel]) &= ~(0x0003 << TXiPRI[Buf_sel]);
 	*(C1TRiCON[Buf_sel]) |= CAN_tx_msg->priority << TXiPRI[Buf_sel];
 	*(C1TRiCON[Buf_sel]) |= TXREQi[Buf_sel];
 	
-	/* Débloque les interupt. */
+	/* Dï¿½bloque les interupt. */
 	RESTORE_CPU_IPL(old_ipl);
 
 	return TRUE;		
 }
 
 /**************************** IS_CAN_MSG_SEND ***************************
-* Description : Fonction qui permet de savoir si un message à été envoyé.
+* Description : Fonction qui permet de savoir si un message ï¿½ ï¿½tï¿½ envoyï¿½.
 *
 * Input :
 *	T_CAN_Tx_MSG * CAN_tx_msg	Pointeur vers la structure du message.		
 *
 * Output :
-* 	int						Retourne TRUE si le message a été transmis.
+* 	int						Retourne TRUE si le message a ï¿½tï¿½ transmis.
 *							Sinon, retourne FALSE.
 *
 ************************************************************************/
@@ -336,12 +334,12 @@ int is_CAN_msg_send(T_CAN_Tx_MSG * CAN_tx_msg)
 *	T_CAN_MODULE CAN_module	Module CAN que l'on veut configurer.
 *							Valeurs possible: CAN_1 ou CAN_2.
 *
-*	char 	filter_number	Numéro du filtre que l'on veut configurer.
-*							Valeurs possible: 0 à 15.
+*	char 	filter_number	Numï¿½ro du filtre que l'on veut configurer.
+*							Valeurs possible: 0 ï¿½ 15.
 *
-*	unsigned long ID		ID devant être configuré dans le filtre.
+*	unsigned long ID		ID devant ï¿½tre configurï¿½ dans le filtre.
 *
-*	T_TYPE_ID type_ID		Type d'ID utilisée.
+*	T_TYPE_ID type_ID		Type d'ID utilisï¿½e.
 *							Valeur possible: STANDARD_ID ou	EXTENDED_ID.
 *
 * Output :	AUCUN
@@ -351,19 +349,19 @@ void config_CAN_filter(unsigned int filter_number, unsigned long ID, T_TYPE_ID t
 {
 	int old_ipl;
 
-	/* Bloque les interrupt le temps de changer le déplacement. */
+	/* Bloque les interrupt le temps de changer le dï¿½placement. */
 	SET_AND_SAVE_CPU_IPL(old_ipl, 7);
 	
-	/* Active la fenêtre pour accéder aux bon registres. */
+	/* Active la fenï¿½tre pour accï¿½der aux bon registres. */
 	C1CTRL1bits.WIN = 1;
 	
 	*(C1RXFiSID[filter_number]) = set_SID_reg(ID, type_ID, 0);	
 	*(C1RXFiEID[filter_number]) = set_EID_reg(ID, type_ID);
 
-	/* Désactive la fenêtre pour accéder aux bon registres. */
+	/* Dï¿½sactive la fenï¿½tre pour accï¿½der aux bon registres. */
 	C1CTRL1bits.WIN = 0;		
 
-	/* Débloque les interupt. */
+	/* Dï¿½bloque les interupt. */
 	RESTORE_CPU_IPL(old_ipl);
 	
 	return;	
@@ -374,12 +372,12 @@ void config_CAN_filter(unsigned int filter_number, unsigned long ID, T_TYPE_ID t
 *	module CAN.
 *
 * Input :
-*	char 	mask_number		Numéro du filtre que l'on veut configurer.
-*							Valeurs possible: 0 à 2.
+*	char 	mask_number		Numï¿½ro du filtre que l'on veut configurer.
+*							Valeurs possible: 0 ï¿½ 2.
 *
-*	unsigned long mask		Valeur devant être configuré dans le masque.
+*	unsigned long mask		Valeur devant ï¿½tre configurï¿½ dans le masque.
 *
-*	T_TYPE_ID type_ID		Type d'ID utilisée.
+*	T_TYPE_ID type_ID		Type d'ID utilisï¿½e.
 *							Valeur possible: STANDARD_ID ou	EXTENDED_ID.
 *
 * Output :	AUCUN
@@ -389,54 +387,54 @@ void config_CAN_mask(unsigned int mask_number, unsigned long mask, T_TYPE_ID typ
 {
 	int old_ipl;
 
-	/* Bloque les interrupt le temps de changer le déplacement. */
+	/* Bloque les interrupt le temps de changer le dï¿½placement. */
 	SET_AND_SAVE_CPU_IPL(old_ipl, 7);
 	
-	/* Active la fenêtre pour accéder aux bon registres. */
+	/* Active la fenï¿½tre pour accï¿½der aux bon registres. */
 	C1CTRL1bits.WIN = 1;
 	
 	*(C1RXMiSID[mask_number]) = set_SID_reg(mask, type_ID, 1);	
 	*(C1RXMiEID[mask_number]) = set_EID_reg(mask, type_ID);
 	
-	/* Désactive la fenêtre pour accéder aux bon registres. */
+	/* Dï¿½sactive la fenï¿½tre pour accï¿½der aux bon registres. */
 	C1CTRL1bits.WIN = 0;
 	
-	/* Débloque les interupt. */
+	/* Dï¿½bloque les interupt. */
 	RESTORE_CPU_IPL(old_ipl);
 	
 	return;	
 }
 
 /************************** RECEIVE_CAN_MSG ***************************
-* Description : Fonction qui configure la réception d'un message.
+* Description : Fonction qui configure la rï¿½ception d'un message.
 *
 * Input :
-*	char 	filter_number	Numéro du filtre utilisé.
-*							Valeurs possible: 0 à 2.
+*	char 	filter_number	Numï¿½ro du filtre utilisï¿½.
+*							Valeurs possible: 0 ï¿½ 2.
 *
-*	char 	filter_number	Numéro du masque utilisé.
-*							Valeurs possible: 0 à 3. (3 = aucun masque)
+*	char 	filter_number	Numï¿½ro du masque utilisï¿½.
+*							Valeurs possible: 0 ï¿½ 3. (3 = aucun masque)
 *
 *	T_TYPE_BUF type_buf		Type de buffer dans lequel le message doit
-*							être placé.
+*							ï¿½tre placï¿½.
 *							Valeur possible: BUF_IND ou	BUF_FIFO.
 *
 *	void (* ptr_fct_receive) (unsigned long ID, T_TYPE_ID type_ID, const void * data_rx, char nbr_data)
-*							Pointeur vers la fonction à utiliser lors de
-*							la réception d'un message.
+*							Pointeur vers la fonction ï¿½ utiliser lors de
+*							la rï¿½ception d'un message.
 *
 * Output :
-*	int				TRUE si la réception à pu être configuré sinon, FALSE.
+*	int				TRUE si la rï¿½ception ï¿½ pu ï¿½tre configurï¿½ sinon, FALSE.
 *
 ************************************************************************/
 void receive_CAN_msg(unsigned int filter_number, unsigned int mask_number, void (* ptr_fct_receive) (unsigned long ID, T_TYPE_ID type_ID, const void * data_rx, char nbr_data))
 {
 	int old_ipl;
 
-	/* Bloque les interrupt le temps de changer le déplacement. */
+	/* Bloque les interrupt le temps de changer le dï¿½placement. */
 	SET_AND_SAVE_CPU_IPL(old_ipl, 7);
 	
-	/* Active la fenêtre pour accéder aux bon registres. */
+	/* Active la fenï¿½tre pour accï¿½der aux bon registres. */
 	C1CTRL1bits.WIN = 1;
 	
 	/* Assigne le masque au filtre. */
@@ -457,28 +455,28 @@ void receive_CAN_msg(unsigned int filter_number, unsigned int mask_number, void 
 	/* Enregistre le pointeur de fonction. */
 	config_CAN.ptr_fct_receive[filter_number] = ptr_fct_receive;
 	
-	/* Désactive la fenêtre pour accéder aux bon registres. */
+	/* Dï¿½sactive la fenï¿½tre pour accï¿½der aux bon registres. */
 	C1CTRL1bits.WIN = 0;		
 	
-	/* Débloque les interupt. */
+	/* Dï¿½bloque les interupt. */
 	RESTORE_CPU_IPL(old_ipl);
 	
 	return;
 }	
 
 /************************ STOP_RECEIVE_CAN_MSG *************************
-* Description : Fonction qui arrête la réception d'un message. 
+* Description : Fonction qui arrï¿½te la rï¿½ception d'un message. 
 *
 * Input :
-*	char 	filter_number	Numéro du filtre dont on veut arrêter la 
-*							réception. Valeurs possible: 0 à 15.
+*	char 	filter_number	Numï¿½ro du filtre dont on veut arrï¿½ter la 
+*							rï¿½ception. Valeurs possible: 0 ï¿½ 15.
 *
 *	Output :	AUCUN
 *
 ************************************************************************/
 void stop_receive_CAN_msg(unsigned int filter_number)
 {
-	/* Désactive le filtre. */
+	/* Dï¿½sactive le filtre. */
 	C1FEN1 &= ~(0x0001 << filter_number);
 	
 	return;
@@ -488,15 +486,15 @@ void stop_receive_CAN_msg(unsigned int filter_number)
 * Description : Fonction qui initialise un cannal DMA.
 *
 * Input :
-*	char 	DMA_channel		Cannal DMA à initialiser.
-*							Valeurs possibles: 0 à 7. 
+*	char 	DMA_channel		Cannal DMA ï¿½ initialiser.
+*							Valeurs possibles: 0 ï¿½ 7. 
 *
 *	char 	DMA_dir			Direction du canal. 1 = Read from SRAM
 *							0 = Write to SRAM
 *
-*	unsigned int IRQ		IRQ du périphérique
+*	unsigned int IRQ		IRQ du pï¿½riphï¿½rique
 *
-*	unsigned int address	Adresse du périphérique
+*	unsigned int address	Adresse du pï¿½riphï¿½rique
 *
 *	void * 	Buf_ptr			Adresse du buffer dans la RAM.
 *
@@ -516,20 +514,20 @@ void stop_receive_CAN_msg(unsigned int filter_number)
 }*/
 
 /**************************** SET_SID_REG ******************************
-* Description : Fonction qui détermine la valeur à mettre dans un 
+* Description : Fonction qui dï¿½termine la valeur ï¿½ mettre dans un 
 * registre SID pour configurer un filtre ou un mask.
 *
 * Input :
-*	unsigned long ID		ID devant être configuré dans le filtre.
+*	unsigned long ID		ID devant ï¿½tre configurï¿½ dans le filtre.
 *
-*	T_TYPE_ID type_ID		Type d'ID utilisée.
+*	T_TYPE_ID type_ID		Type d'ID utilisï¿½e.
 *							Valeur possible: STANDARD_ID ou	EXTENDED_ID.
 *
 *	char mask_or_filter		Flag qui indique si il s'agit d'un filtre ou 
 *							d'un mask. 1 = mask, 0 = filter.
 *
 * Output :	
-*	unsigned int			Valeur à mettre dans le registre.
+*	unsigned int			Valeur ï¿½ mettre dans le registre.
 *
 ************************************************************************/
 static unsigned int set_SID_reg(unsigned long ID, T_TYPE_ID type_ID, char mask_or_filter)
@@ -547,17 +545,17 @@ static unsigned int set_SID_reg(unsigned long ID, T_TYPE_ID type_ID, char mask_o
 }
 
 /**************************** SET_EID_REG ******************************
-* Description : Fonction qui détermine la valeur à mettre dans un 
+* Description : Fonction qui dï¿½termine la valeur ï¿½ mettre dans un 
 * registre EID pour configurer un filtre ou un mask.
 *
 * Input :
-*	unsigned long ID		ID devant être configuré dans le filtre.
+*	unsigned long ID		ID devant ï¿½tre configurï¿½ dans le filtre.
 *
-*	T_TYPE_ID type_ID		Type d'ID utilisée.
+*	T_TYPE_ID type_ID		Type d'ID utilisï¿½e.
 *							Valeur possible: STANDARD_ID ou	EXTENDED_ID.
 *
 * Output :	
-*	unsigned int			Valeur à mettre dans le registre.
+*	unsigned int			Valeur ï¿½ mettre dans le registre.
 *
 ************************************************************************/
 static unsigned int set_EID_reg(unsigned long ID, T_TYPE_ID type_ID)
@@ -600,12 +598,12 @@ void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 #ifdef DEBUG_CAN 
        uart1PutChar('.');	
 #endif
-		/* C'est un buffer configuré en Rx qui a généré l'interrupt. */
+		/* C'est un buffer configurï¿½ en Rx qui a gï¿½nï¿½rï¿½ l'interrupt. */
 		while( (C1RXFUL1 != 0) || (C1RXFUL2 != 0) )
 		{
 			Buf_read_ptr = C1FIFO & 0x003F;
 		
-			/* Détermine l'ID du message reçu selon le type. */
+			/* Dï¿½termine l'ID du message reï¿½u selon le type. */
 			if( (CAN_msg_Buf[Buf_read_ptr][0] & 0x0001) == 1)
 			{
 				/* Extended ID */
@@ -629,7 +627,7 @@ void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 				C1RXFUL1 &= ~(0x0001 << Buf_read_ptr);
 			}
 
-			/* Exécute la fonction associé à ce message. */
+			/* Exï¿½cute la fonction associï¿½ ï¿½ ce message. */
 			filter_hit = (CAN_msg_Buf[Buf_read_ptr][7] & 0x1F00) >> 8;
 			if(config_CAN.ptr_fct_receive[filter_hit] != NULL)
 			{
@@ -647,8 +645,8 @@ void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 		counter_tx++;
 
 		C1INTFbits.TBIF = 0;
-		/* C'est un buffer configuré en Tx qui a généré l'interrupt. */
-		/* Vérifie quel buffer en Tx s'est libéré. */
+		/* C'est un buffer configurï¿½ en Tx qui a gï¿½nï¿½rï¿½ l'interrupt. */
+		/* Vï¿½rifie quel buffer en Tx s'est libï¿½rï¿½. */
 		for(ii = 0; ii < config_CAN.nbr_buf_Tx; ii++)
 		{
 			if( (config_CAN.etat_Buf[ii] == TRUE) && ((*C1TRiCON[ii] & TXREQi[ii]) == 0) )
@@ -684,5 +682,3 @@ void can_get_buttons(unsigned long ID, T_TYPE_ID type_ID, const void * data_rx, 
 	// Restore interruptions
 	RESTORE_CPU_IPL(old_ipl);
 }
-
-#endif // DSPIC33F

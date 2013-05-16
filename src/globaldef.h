@@ -1,47 +1,32 @@
-/************************************************************/
-/* globaldef.h                                              */
-/* Library that contain global definitions                  */
-/*                                                          */
-/*                                                          */
-/* Author :     Chinook ETS                                 */
-/* Date	  :	13/05/2013                                  */
-/************************************************************/
+#ifndef __GLOBALDEF_H_
+#define __GLOBALDEF_H_
 
-/************************************************************/
-#ifndef _GLOBALDEF_MODULE_
-#define _GLOBALDEF_MODULE_
-/************************************************************/
-
-/************************************************************/
-/*                         INCLUDES                         */
-/************************************************************/
-/*Typedefs from C30*/
+#include <stdlib.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
-/************************************************************/
 
+// Thoses types are in stdint and others
 
-/************************************************************/
-/*		       MACRO DEFINITIONS                    */
-/************************************************************/
-#define OUTPUT		0
-#define INPUT		1
+//typedef unsigned char      bool;
+//typedef unsigned char      uint8_t;
+//typedef char               int8_t;
+//typedef unsigned int       uint16_t;
+//typedef int                int16_t;
+//typedef unsigned long      uint32_t;
+//typedef long               int32_t;
+//typedef unsigned long long uint64_t;
+//typedef long long          int64_t;
 
 #ifndef NULL
-#define NULL		0
+#define NULL    0
 #endif
 
-#define ENABLE		1
-#define DISABLE		0
+#define TRUE    1
+#define FALSE   0
+#define ENABLE  1
+#define DISABLE 0
+#define ON      1
+#define OFF     0
 
-#define TRUE		1
-#define FALSE		0
-
-#define PI              3.14159265359f
-
-/************************************************************/
-
-
-/************************************************************/
-#endif
-/************************************************************/
+#endif // __GLOBALDEF_H_

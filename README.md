@@ -5,8 +5,8 @@ Tools and MCU
 -----------------
 
 - MCU       :  DSPIC33E
-- MPLAB IDE :  V8.85
-- Compiler  :  C30 from Microchip
+- MPLAB IDE : X. V 1.8
+- Compiler  :  X15 from Microchip
 
 Data type used
 -----------------
