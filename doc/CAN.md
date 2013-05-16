@@ -19,8 +19,8 @@ Configuration des pins
     _C1RXR = 98;       //RP98 Pin 34
     RP99R = 0b001110;  //RP99 Pin 33
 
-Configuration du débit
-----------------------
+Configuration du débit (`can.h`)
+--------------------------------
 
     // #define FCAN_800KBITS
     // #define FCAN_250KBITS
@@ -38,6 +38,8 @@ Utilisation de la librairie
 - Ajouter les entêtes dans votre programme
   - `can_chinook3.h` 
   - `can.h`
+
+Dans le code:
 
     #include "can.h"
     #include "can_chinook3.h"
