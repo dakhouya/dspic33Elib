@@ -5,8 +5,7 @@
 /* MCU : dspic33E                                           */
 /*                                                          */
 /* Author : David Khouya                                    */
-/* Date	  :	02/04/2013                                  */
-/* Version: 1.0                                             */
+/* Date	  :	26/05/2013                                  */
 /************************************************************/
 
 /************************************************************/
@@ -60,7 +59,7 @@ static uint16_t* I2cxrcv[] =
 /************************************************************/
 /*			PRIVATE PROTOTYPES                  */
 /************************************************************/
-bool I2CFlag(void);
+bool I2CFlag(uint8_t ubI2cNo);
 bool IsI2CInterfaceValid(uint8_t ubI2cNo);
 /************************************************************/
 
@@ -105,20 +104,9 @@ bool I2C_Init(uint8_t ubI2cNo,float fSpeed)
 
         /*Restart slaves in a known mode*/
         I2cxconbits[ubI2cNo]->RSEN = 1;
-
-        /*Reset flags and interrupts*/
-        switch(ubI2cNo)
-        {
-            case I2C_1:
-                /*Clear flag*/
-                IFS1bits.MI2C1IF = 0;
-                break;
-
-            case I2C_2:
-                /*Clear flag*/
-                IFS3bits.MI2C2IF = 0;
-                break;
-        }
+        I2CFlag(ubI2cNo);
+        I2cxconbits[ubI2cNo]->PEN = 1;//Stop
+	I2CFlag(ubI2cNo);
     }
     return ubValid;
 }
@@ -201,19 +189,19 @@ bool I2C_Send(uint8_t ubAddress,uint8_t ubRegister,uint8_t ubData, uint8_t ubI2c
 	if(ubValid)
 	{
 		I2cxconbits[ubI2cNo]->SEN=1;//Start
-		I2CFlag();//Wait for the end of the transmission
+		I2CFlag(ubI2cNo);//Wait for the end of the transmission
 
 		*I2cxtrn[ubI2cNo]=ubAddress;//Slave Address(Write)
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 
 		*I2cxtrn[ubI2cNo]=ubRegister;//Slave Register Address
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 
 		*I2cxtrn[ubI2cNo]=ubData;//write data to selected register
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 
 		I2cxconbits[ubI2cNo]->PEN=1;//Stop
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 	}
 	return ubValid;
 }
@@ -244,29 +232,29 @@ bool I2C_Receive(uint8_t ubAddressWrite,uint8_t ubAddressRead,uint8_t ubRegister
 	{
 	
 		I2cxconbits[ubI2cNo]->SEN=1;//Start
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 	
 		*I2cxtrn[ubI2cNo]=ubAddressWrite;//Slave Address(Write)
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 	
 		*I2cxtrn[ubI2cNo]= ubRegister;//Slave Register Address
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 	
 		I2C1CONbits.RSEN = 1;//Restart
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 	
 		*I2cxtrn[ubI2cNo]= ubAddressRead;//Slave Address(Read)
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 	
 		I2cxconbits[ubI2cNo]->RCEN = 1;//Receive mode
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 	
 		*ubData = *I2cxrcv[ubI2cNo];//I2C Receive buffer to unsigned char
 		I2cxconbits[ubI2cNo]->ACKEN = 1;//Enable Acknowledge
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 	
 		I2cxconbits[ubI2cNo]->PEN = 1;//Stop
-		I2CFlag();
+		I2CFlag(ubI2cNo);
 	}
 
 	return ubValid;
@@ -288,15 +276,33 @@ I2C_receive
 
 */
 /************************************************************/
-bool I2CFlag(void)
+bool I2CFlag(uint8_t ubI2cNo)
 {
     bool bValid = TRUE;
+    bValid = IsI2CInterfaceValid(ubI2cNo);
+    
+    if(bValid)
+    {
+        switch(ubI2cNo)
+        {
+            case I2C_1:
+                /*Clear flag*/
+                while(IFS1bits.MI2C1IF == 0 || ubI2cTimeout);
+                break;
 
-    while(IFS1bits.MI2C1IF==0 || ubI2cTimeout);
+            case I2C_2:
+                /*Clear flag*/
+                while(IFS3bits.MI2C2IF == 0 || ubI2cTimeout);
+                break;
+        }
+    }
+
     if(ubI2cTimeout)
     {
         bValid = FALSE;
     }
+
+
     IFS1bits.MI2C1IF=0;//I2C interrupt flag
 
     return bValid;
