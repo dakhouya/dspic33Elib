@@ -287,12 +287,12 @@ bool I2CFlag(uint8_t ubI2cNo)
         {
             case I2C_1:
                 /*Clear flag*/
-                while(IFS1bits.MI2C1IF == 0 || ubI2cTimeout);
+                while(IFS1bits.MI2C1IF == 0 || !ubI2cTimeout);
                 break;
 
             case I2C_2:
                 /*Clear flag*/
-                while(IFS3bits.MI2C2IF == 0 || ubI2cTimeout);
+                while(IFS3bits.MI2C2IF == 0 || !ubI2cTimeout);
                 break;
         }
     }
