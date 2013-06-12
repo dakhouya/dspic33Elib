@@ -5,15 +5,23 @@
 /* MCU : dspic33E                                           */
 /*                                                          */
 /* Author : David Khouya                                    */
-/* Date	  : 19/04/2013                                      */
+/* Date	  : 11/06/2013                                      */
 /************************************************************/
 
 #ifndef _UART_MODULE_
 #define _UART_MODULE_
 
-#include "../../../globaldef.h"
-#include "../../../hardware_profile.h"
+#include "../globaldef.h"
+#include "../hardware_profile.h"
+#include <string.h>
 
+/************************************************************/
+/*                     MACRO DEFINITIONS                    */
+/************************************************************/
+/*Should be in hardware profil definitions*/
+/*#ifndef CPU_CLOCK
+#define CPU_CLOCK 				20000000.0f
+#endif*/
 
 #define UART_BUFFER_SIZE                        256
 #define NBUART                                  4
@@ -42,10 +50,10 @@
 #define UART_19600BAUD				19600.0f
 #define UART_38400BAUD				38400.0f
 #define UART_57600BAUD				57600.0f
-#define UART_115200BAUD				115200.0f	
+#define UART_115200BAUD				115200.0f
 
 /*TX Interrupt Mode*/
-#define	CHAR_N_BUFFER_EMPTY			0x8000		
+#define	CHAR_N_BUFFER_EMPTY			0x8000
 #define	TRANSMIT_OPERATION_COMPLETED            0x2000
 #define ANY_CHAR_N_BUFFER_EMPTY                 0x0000
 
@@ -103,7 +111,12 @@
 #define U4TXIF						0x0020
 #define U4RXIF						0x0010
 
+/************************************************************/
 
+
+/************************************************************/
+/*                  STRUCTURE DEFINITIONS                   */
+/************************************************************/
 typedef struct Param
 {
 	uint8_t BRGH;
@@ -124,6 +137,7 @@ typedef struct UartPort
 	uint8_t	TxIsBusy;
 	void	(*Txfct)(uint8_t ubUartNo, uint8_t ubChar);
 	void	(*Rxfct)(uint8_t ubUartNo, uint8_t ubChar);
+        void	(*RxLineEvt)(const char*, size_t);
 }sUartPort_t;
 
 typedef struct UartInit
@@ -136,12 +150,20 @@ typedef struct UartInit
 }sUartInit_t;
 
 
+/************************************************************/
+
+
+/************************************************************/
+/*		      PUBLIC PROTOTYPES                     */
+/************************************************************/
 void UartInit(uint8_t ubUartNo, sUartParam*);
 void UartInitPortStruc(uint8_t ubUartNo,
 					   void (*Txfct)(uint8_t ubUartNo, uint8_t ubChar),
 					   void (*Rxfct)(uint8_t ubUartNo, uint8_t ubChar));
 void UartEcho(uint8_t ubUartNo);
-void UartTxFrame(uint8_t ubUartNo, char* ubString, size_t ubLength);
+void UartClear(uint8_t ubUartNo);
+
+void UartTxFrame(uint8_t ubUartNo, char* ubString,size_t ubLength);
 
 void UartTxEnable(uint8_t ubUartNo, bool state);
 void UartInterruptRxEnable(uint8_t ubUartNo, uint16_t usMode, uint8_t ubPriority, bool state);
@@ -150,4 +172,10 @@ void UartInterruptTxEnable(uint8_t ubUartNo, uint16_t usMode, uint8_t ubPriority
 void UartInterruptTx(uint8_t ubUartNo);
 void UartInterruptRx(uint8_t ubUartNo);
 
-#endif // _UART_MODULE_
+void UartSetRXLineEvt(uint8_t ubUartNo,void (*evt)(const char*, size_t));
+/************************************************************/
+
+
+/************************************************************/
+#endif
+/************************************************************/
