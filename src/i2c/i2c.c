@@ -5,19 +5,13 @@
 /* MCU : dspic33E                                           */
 /*                                                          */
 /* Author : David Khouya                                    */
-/* Date	  :	26/05/2013                                  */
+/* Date	  : 26/06/2013                                      */
 /************************************************************/
 
 /************************************************************/
 /*			INCLUDES                            */
 /************************************************************/
 #include"i2c.h"
-/************************************************************/
-
-/************************************************************/
-/*                  PUBLIC VARIABLES                       */
-/************************************************************/
-uint8_t ubI2cTimeout = 0;
 /************************************************************/
 
 /************************************************************/
@@ -280,6 +274,7 @@ bool I2CFlag(uint8_t ubI2cNo)
 {
     bool bValid = TRUE;
     bValid = IsI2CInterfaceValid(ubI2cNo);
+    uint32_t usI2CTimeout = I2C_TIMEOUT;
     
     if(bValid)
     {
@@ -287,17 +282,17 @@ bool I2CFlag(uint8_t ubI2cNo)
         {
             case I2C_1:
                 /*Clear flag*/
-                while(IFS1bits.MI2C1IF == 0 && !ubI2cTimeout);
+                while(IFS1bits.MI2C1IF == 0 && usI2CTimeout--);
                 break;
 
             case I2C_2:
                 /*Clear flag*/
-                while(IFS3bits.MI2C2IF == 0 && !ubI2cTimeout);
+                while(IFS3bits.MI2C2IF == 0 && usI2CTimeout--);
                 break;
         }
     }
 
-    if(ubI2cTimeout)
+    if(usI2CTimeout == 0)
     {
         bValid = FALSE;
     }
