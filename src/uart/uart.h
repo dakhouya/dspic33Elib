@@ -163,7 +163,7 @@ void UartInitPortStruc(uint8_t ubUartNo,
 void UartEcho(uint8_t ubUartNo);
 void UartClear(uint8_t ubUartNo);
 
-void UartTxFrame(uint8_t ubUartNo, char* ubString,size_t ubLength);
+void UartTxFrame(uint8_t ubUartNo, int8_t* ubString,size_t ubLength);
 
 void UartTxEnable(uint8_t ubUartNo, bool state);
 void UartInterruptRxEnable(uint8_t ubUartNo, uint16_t usMode, uint8_t ubPriority, bool state);
@@ -179,3 +179,4 @@ void UartSetRXLineEvt(uint8_t ubUartNo,void (*evt)(const char*, size_t));
 /************************************************************/
 #endif
 /************************************************************/
+

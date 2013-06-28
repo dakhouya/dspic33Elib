@@ -260,7 +260,7 @@ void UartEcho(uint8_t ubUartNo)
                 switch(newChar){
                     // On backspace clear lastcharacter from buffer and send backspace char
                     case '\b':
-                        UartTxFrame(ubUartNo, (char*)"\b \b", 3 );
+                        UartTxFrame(ubUartNo, (int8_t*)"\b \b", 3 );
 
                         port.RxBuffer[port.RxMessageLength-1] = '\0';
                         port.RxMessageLength -=1;
@@ -268,12 +268,12 @@ void UartEcho(uint8_t ubUartNo)
                     // On line break call line break function and clear the buff
                     case '\n':
                     case '\r':
-                        UartTxFrame(ubUartNo, (char*)&newChar, 1);
+                        UartTxFrame(ubUartNo, (int8_t*)&newChar, 1);
                         (*port.RxLineEvt)(port.RxBuffer,port.RxMessageLength);
                         UartClear(ubUartNo);
                         break;
                     default:
-                        UartTxFrame(ubUartNo, (char*)&newChar, 1);
+                        UartTxFrame(ubUartNo, (int8_t*)&newChar, 1);
                         break;
                 }
                 if(port.RxBuffer[port.RxMessageLength-1] == '\b'){
@@ -309,7 +309,7 @@ UartTxFrame
 				-None
 */
 /************************************************************/
-void UartTxFrame(uint8_t ubUartNo, char* ubString, size_t ubLength)
+void UartTxFrame(uint8_t ubUartNo, int8_t* ubString, size_t ubLength)
 {
 
 	uint8_t ubCounter;
