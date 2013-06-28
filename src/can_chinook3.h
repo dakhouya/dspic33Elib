@@ -6,8 +6,7 @@
 #define CAN_MSG_MANUAL_PITCH_SID          0x10C
 #define CAN_MSG_BRAKE_SID                 0x11C
 #define CAN_MSG_BUTTON_CMD_SID            0x12C
-#define CAN_MSG_SHIFT_UP_SID              0x1EA
-#define CAN_MSG_SHIFT_DOWN_SID            0x1EA
+#define CAN_MSG_SHIFT_SID              	  0x1EA
 #define CAN_MSG_WIND_SPEED_SID            0x20D
 #define CAN_MSG_WIND_DIRECTION_SID        0x21D
 #define CAN_MSG_TURBINE_RPM_SENSOR_SID    0x22D
