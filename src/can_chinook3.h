@@ -3,6 +3,8 @@
 
 /***MESSAGES SID***/
 #define CAN_MSG_PITCH_ORIENTATION_SID     0x10E
+#define CAN_MSG_EEPROM_CONFIG_ANSWER_SID  0x10D
+#define CAN_MSG_EEPROM_CONFIG_REQUEST_SID 0x109
 #define CAN_MSG_MANUAL_PITCH_SID          0x10C
 #define CAN_MSG_BRAKE_SID                 0x11C
 #define CAN_MSG_BUTTON_CMD_SID            0x12C
@@ -13,7 +15,7 @@
 #define CAN_MSG_TURBINE_RPM_MOTOR_SID     0x23B
 #define CAN_MSG_WHEEL_RPM_SID             0x24D
 #define CAN_MSG_TRUST_SID                 0x25D
-#define CAN_MSG_TORQUE_SID                0x26B
+#define CAN_MSG_TORQUE_SID                0x26D
 #define CAN_MSG_TURBINE_DIRECTION_SID     0x279
 #define CAN_MSG_GEAR_SID                  0x289
 #define CAN_MSG_GEAR_FUJIN_SID            0x28E
