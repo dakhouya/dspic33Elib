@@ -132,7 +132,5 @@ void receive_CAN_msg(unsigned int filter_number, unsigned int mask_number, void 
 
 void stop_receive_CAN_msg(unsigned int filter_number);
 
-void can_get_buttons(unsigned long ID, T_TYPE_ID type_ID, const void * data_rx, char nbr_data);
-
 #endif
 
