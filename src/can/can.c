@@ -28,7 +28,7 @@ static unsigned int set_EID_reg(unsigned long ID, T_TYPE_ID type_ID);
 /***************** D�CLARATION DES VARIABLES GLOBALES ******************/
 /* Buffer utilis� dans la DMA. */
 
-unsigned int CAN_msg_Buf[32][8] __attribute__((aligned(32 * 16)));
+__eds__ unsigned int CAN_msg_Buf[32][16] __attribute__((eds,space(dma),aligned(32*16)));
 
 T_CAN_CONFIG config_CAN;
 
