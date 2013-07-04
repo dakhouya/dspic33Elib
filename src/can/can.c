@@ -11,10 +11,10 @@
 #define DSPIC33F
 #ifdef DSPIC33F
 #include "can.h"
+#include "global.h"
 #include "can_chinook3.h"
-#include "p33EP512MC806.h"
+#include "p33EP512MU810.h"
 #include <stdlib.h>
-#include "globaldef.h"
 #include "dma.h"
 
 
@@ -28,7 +28,7 @@ static unsigned int set_EID_reg(unsigned long ID, T_TYPE_ID type_ID);
 /***************** D�CLARATION DES VARIABLES GLOBALES ******************/
 /* Buffer utilis� dans la DMA. */
 
-__eds__ unsigned int CAN_msg_Buf[32][16] __attribute__((eds,space(dma),aligned(32*16)));
+__eds__ unsigned int CAN_msg_Buf[32][8] __attribute__((eds,space(dma),aligned(32*16)));
 
 T_CAN_CONFIG config_CAN;
 
@@ -593,11 +593,11 @@ static unsigned int set_EID_reg(unsigned long ID, T_TYPE_ID type_ID)
 ************************************************************************/
 void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 {
-    //Led3^=1;
 	char temp_win;
 	unsigned int ii=0, Buf_read_ptr=0, filter_hit=0;
 	unsigned long ID_rx=0;
 	T_TYPE_ID type_ID_rx;
+        unsigned int test=0;
 	
 	temp_win = C1CTRL1bits.WIN;
 	C1CTRL1bits.WIN = 0;
@@ -610,9 +610,9 @@ void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 		while( (C1RXFUL1 != 0) || (C1RXFUL2 != 0) )
 		{
 			Buf_read_ptr = C1FIFO & 0x003F;
-		
+                        test = *CAN_msg_Buf[8];// & 0x0001;
 			/* D�termine l'ID du message re�u selon le type. */
-			if( (CAN_msg_Buf[Buf_read_ptr][0] & 0x0001) == 1)
+			if((*CAN_msg_Buf[Buf_read_ptr] & 0x0001) == 1)
 			{
 				/* Extended ID */
 				ID_rx = ((unsigned long)(CAN_msg_Buf[Buf_read_ptr][1] & 0x0FFF) << 17) | ((unsigned long)(CAN_msg_Buf[Buf_read_ptr][2] & 0xFC00) << 1) | ((unsigned long)(CAN_msg_Buf[Buf_read_ptr][0] & 0x1FFC) >> 2);
@@ -621,7 +621,7 @@ void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 			else
 			{
 				/* Standard ID */
-				ID_rx = (unsigned long)((CAN_msg_Buf[Buf_read_ptr][0] & 0x1FFC) >> 2);
+				ID_rx = (unsigned long)((*CAN_msg_Buf[Buf_read_ptr] & 0x1FFC) >> 2);
 				type_ID_rx = STANDARD_ID;						
 			}		 
 			
@@ -636,10 +636,10 @@ void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 			}
 
 			/* Ex�cute la fonction associ� � ce message. */
-			filter_hit = (CAN_msg_Buf[Buf_read_ptr][7] & 0x1F00) >> 8;
+			filter_hit = (*(CAN_msg_Buf[Buf_read_ptr]+7) & 0x1F00) >> 8;
 			if(config_CAN.ptr_fct_receive[filter_hit] != NULL)
 			{
-				config_CAN.ptr_fct_receive[filter_hit](ID_rx, type_ID_rx, &CAN_msg_Buf[Buf_read_ptr][3], (char)(CAN_msg_Buf[Buf_read_ptr][2] & 0x000F));
+				config_CAN.ptr_fct_receive[filter_hit](ID_rx, type_ID_rx, (CAN_msg_Buf[Buf_read_ptr]+3), (char)(*(CAN_msg_Buf[Buf_read_ptr]+2) & 0x000F));
 				
 			}
 
