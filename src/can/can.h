@@ -77,7 +77,6 @@
 #endif
 
 /****************************** STRUCTURE *****************************/
-
 typedef enum
 {
 	CAN_NORMAL=0,
@@ -109,7 +108,19 @@ typedef struct
 	T_CAN_Tx_MSG * Buf_Tx_assign[8];	// Pointeur vers les messages contenu dans les buffer en Tx
 	void (* ptr_fct_receive[16]) (unsigned long ID, T_TYPE_ID type_ID, const void * data_rx, char nbr_data);	// Liste des pointeur de fonction à executer lorsqu'un
 																												// message est reçu dans un buffer.
-}T_CAN_CONFIG;	
+}T_CAN_CONFIG;
+
+typedef struct
+{
+	unsigned int data0;
+	unsigned int data1;
+        unsigned int data2;
+        unsigned int data3;
+        unsigned int data4;
+        unsigned int data5;
+        unsigned int data6;
+        unsigned int data7;
+}T_CAN_DATA;
 
 /***************************** PROTOTYPES *****************************/
 
@@ -128,7 +139,7 @@ void config_CAN_filter(unsigned int filter_number, unsigned long ID, T_TYPE_ID t
 
 void config_CAN_mask(unsigned int mask_number, unsigned long mask, T_TYPE_ID type_ID);
 
-void receive_CAN_msg(unsigned int filter_number, unsigned int mask_number, void (* ptr_fct_receive) (unsigned long ID, T_TYPE_ID type_ID, const void * data_rx, char nbr_data));
+void receive_CAN_msg(unsigned int filter_number, unsigned int mask_number, void (* ptr_fct_receive) (unsigned long ID, T_TYPE_ID type_ID, T_CAN_DATA* data_rx, char nbr_data));
 
 void stop_receive_CAN_msg(unsigned int filter_number);
 

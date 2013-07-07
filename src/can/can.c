@@ -13,7 +13,7 @@
 #include "can.h"
 #include "global.h"
 #include "can_chinook3.h"
-#include "p33EP512MU810.h"
+#include "p33EP512MC806.h"
 #include <stdlib.h>
 #include "dma.h"
 
@@ -25,11 +25,10 @@ static unsigned int set_SID_reg(unsigned long ID, T_TYPE_ID type_ID, char mask_o
 
 static unsigned int set_EID_reg(unsigned long ID, T_TYPE_ID type_ID);
 
-/***************** Dï¿½CLARATION DES VARIABLES GLOBALES ******************/
-/* Buffer utilisï¿½ dans la DMA. */
+/***************** DÉCLARATION DES VARIABLES GLOBALES ******************/
+/* Buffer utilisé dans la DMA. */
 
-__eds__ unsigned int CAN_msg_Buf[32][8] __attribute__((eds,space(dma),aligned(32*16)));
-
+__eds__ unsigned int CAN_msg_Buf[32][8] __attribute__((space(dma),eds,aligned(32*16)));
 T_CAN_CONFIG config_CAN;
 
 /* Les tableaux suivant contiennent les adresses des diffï¿½rent registres. */
@@ -151,8 +150,8 @@ void init_CAN(T_CAN_MODE mode, unsigned int nbr_buf_Tx, unsigned int DMA_Rx, uns
 	}
 	
 	/* Configuration des canaux DMA. */
-	init_DMA_channel(DMA_Tx, 1, 0x0046, 0x0442, __builtin_dmaoffset(CAN_msg_Buf));
-	init_DMA_channel(DMA_Rx, 0, 0x0022, 0x0440, __builtin_dmaoffset(CAN_msg_Buf));
+	init_DMA_channel(DMA_Tx, 1, 0x0046, 0x0442,__builtin_dmaoffset(CAN_msg_Buf));
+	init_DMA_channel(DMA_Rx, 0, 0x0022, 0x0440,__builtin_dmaoffset(CAN_msg_Buf));
 	
 	/* Configuration de l'interuption. */	
 	/* Commence par faire un clear des interuption. */
@@ -310,7 +309,6 @@ int send_CAN_msg(T_CAN_Tx_MSG * CAN_tx_msg, const void * data_scr, char nbr_data
 	
 	/* Dï¿½bloque les interupt. */
 	RESTORE_CPU_IPL(old_ipl);
-
 	return TRUE;		
 }
 
@@ -438,7 +436,7 @@ void config_CAN_mask(unsigned int mask_number, unsigned long mask, T_TYPE_ID typ
 *	int				TRUE si la rï¿½ception ï¿½ pu ï¿½tre configurï¿½ sinon, FALSE.
 *
 ************************************************************************/
-void receive_CAN_msg(unsigned int filter_number, unsigned int mask_number, void (* ptr_fct_receive) (unsigned long ID, T_TYPE_ID type_ID, const void * data_rx, char nbr_data))
+void receive_CAN_msg(unsigned int filter_number, unsigned int mask_number, void (* ptr_fct_receive) (unsigned long ID, T_TYPE_ID type_ID, T_CAN_DATA* data_rx, char nbr_data))
 {
 	int old_ipl;
 
@@ -597,7 +595,8 @@ void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 	unsigned int ii=0, Buf_read_ptr=0, filter_hit=0;
 	unsigned long ID_rx=0;
 	T_TYPE_ID type_ID_rx;
-        unsigned int test=0;
+        unsigned int test[8]={0};
+        T_CAN_DATA recopie;
 	
 	temp_win = C1CTRL1bits.WIN;
 	C1CTRL1bits.WIN = 0;
@@ -610,18 +609,27 @@ void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 		while( (C1RXFUL1 != 0) || (C1RXFUL2 != 0) )
 		{
 			Buf_read_ptr = C1FIFO & 0x003F;
-                        test = *CAN_msg_Buf[8];// & 0x0001;
+                        test[0] = *(CAN_msg_Buf[Buf_read_ptr]);// & 0x0001;
+                        recopie.data0=*(CAN_msg_Buf[Buf_read_ptr]);
+                        recopie.data1=*(CAN_msg_Buf[Buf_read_ptr]+1*sizeof(char));
+                        recopie.data2=*(CAN_msg_Buf[Buf_read_ptr]+2*sizeof(char));
+                        recopie.data3=*(CAN_msg_Buf[Buf_read_ptr]+3*sizeof(char));
+                        recopie.data4=*(CAN_msg_Buf[Buf_read_ptr]+4*sizeof(char));
+                        recopie.data5=*(CAN_msg_Buf[Buf_read_ptr]+5*sizeof(char));
+                        recopie.data6=*(CAN_msg_Buf[Buf_read_ptr]+6*sizeof(char));
+                        recopie.data7=*(CAN_msg_Buf[Buf_read_ptr]+7*sizeof(char));
+
 			/* Dï¿½termine l'ID du message reï¿½u selon le type. */
-			if((*CAN_msg_Buf[Buf_read_ptr] & 0x0001) == 1)
+			if((recopie.data0 & 0x0001) == 1)
 			{
 				/* Extended ID */
-				ID_rx = ((unsigned long)(CAN_msg_Buf[Buf_read_ptr][1] & 0x0FFF) << 17) | ((unsigned long)(CAN_msg_Buf[Buf_read_ptr][2] & 0xFC00) << 1) | ((unsigned long)(CAN_msg_Buf[Buf_read_ptr][0] & 0x1FFC) >> 2);
+				ID_rx = ((unsigned long)(*(CAN_msg_Buf[Buf_read_ptr]+1) & 0x0FFF) << 17) | ((unsigned long)(CAN_msg_Buf[Buf_read_ptr][2] & 0xFC00) << 1) | ((unsigned long)(CAN_msg_Buf[Buf_read_ptr][0] & 0x1FFC) >> 2);
 				type_ID_rx = EXTENDED_ID;
 			}
 			else
 			{
 				/* Standard ID */
-				ID_rx = (unsigned long)((*CAN_msg_Buf[Buf_read_ptr] & 0x1FFC) >> 2);
+				ID_rx = (unsigned long)((recopie.data0 & 0x1FFC) >> 2);
 				type_ID_rx = STANDARD_ID;						
 			}		 
 			
@@ -636,10 +644,10 @@ void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 			}
 
 			/* Exï¿½cute la fonction associï¿½ ï¿½ ce message. */
-			filter_hit = (*(CAN_msg_Buf[Buf_read_ptr]+7) & 0x1F00) >> 8;
+			filter_hit = (recopie.data7 >> 8) & 0x001F;
 			if(config_CAN.ptr_fct_receive[filter_hit] != NULL)
 			{
-				config_CAN.ptr_fct_receive[filter_hit](ID_rx, type_ID_rx, (CAN_msg_Buf[Buf_read_ptr]+3), (char)(*(CAN_msg_Buf[Buf_read_ptr]+2) & 0x000F));
+				config_CAN.ptr_fct_receive[filter_hit](ID_rx, type_ID_rx,&recopie, (int)(recopie.data2 & 0x000F));//(CAN_msg_Buf[Buf_read_ptr]+3), (int)(recopie.data2 & 0x000F));
 				
 			}
 
@@ -665,7 +673,10 @@ void __attribute__((interrupt,no_auto_psv))_C1Interrupt(void)
 			}
 		}	
 	}
-	/*Error interrupt flag*/
+	
+	C1CTRL1bits.WIN = temp_win;
+
+        /*Error interrupt flag*/
         if(C1INTFbits.ERRIF == 1)
         {
             C1INTFbits.ERRIF = 0;
