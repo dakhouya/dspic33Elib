@@ -100,7 +100,7 @@
 // - Vibration/Accélération   [m/s^2]
 #define CAN_MSG_ACCELERATION_SID          0x6BD
 // - Message de configuration de gear
-#define CAN_MSG_EEPROM_CONFIG_ANSWER_SID  0x10D
+#define CAN_MSG_EEPROM_CONFIG_SEND_SID  0x10D
 
 // Mât et transmission :
 // ------------------------
@@ -118,6 +118,6 @@
 // - Gear de la transmission  []         {1 à 14 :  à confirmer}
 #define CAN_MSG_GEAR_SID                  0x289
 // - Demande de la dernière gear
-#define CAN_MSG_EEPROM_CONFIG_REQUEST_SID 0x109
+#define CAN_MSG_EEPROM_CONFIG_ACK_SID     0x109
 
 #endif
